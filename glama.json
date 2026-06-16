@@ -1,0 +1,13 @@
+{
+  "$schema": "https://glama.ai/schemas/glama.json",
+  "name": "scala-mcp-server",
+  "display_name": "SCALA Score — Company Data",
+  "description": "Search and enrich data from 250M+ companies across 50+ countries. Company lookup by name, VAT, or ID, NACE sector search, and financial data from official EU business registries.",
+  "author": {
+    "name": "Alessandro Binda",
+    "url": "https://get-scala.com"
+  },
+  "repository": "https://github.com/Alessandro114/scala-mcp-server",
+  "tags": ["company-data", "business-intelligence", "data-enrichment", "financial-data", "eu-registries"],
+  "categories": ["data", "business"]
+}
