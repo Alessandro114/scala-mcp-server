@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.alessandro114/scala-score",
+  "description": "MCP server for S.C.A.L.A. Score API — let Claude, ChatGPT, and AI agents search 250M+ companies",
+  "repository": {
+    "url": "https://github.com/Alessandro114/scala-mcp-server",
+    "source": "github"
+  },
+  "version": "0.1.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "scala-mcp-server",
+      "version": "0.1.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "Score API key (optional, free tier works without it)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "SCORE_API_KEY"
+        }
+      ]
+    }
+  ]
+}

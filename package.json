@@ -1,6 +1,7 @@
 {
   "name": "scala-mcp-server",
-  "version": "0.1.1",
+  "version": "0.1.2",
+  "mcpName": "io.github.alessandro114/scala-score",
   "description": "MCP server for S.C.A.L.A. Score API — let Claude, ChatGPT, and AI agents search 250M+ companies",
   "type": "module",
   "bin": {
