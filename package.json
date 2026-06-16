@@ -1,7 +1,7 @@
 {
-  "name": "@scala/mcp-server",
-  "version": "0.1.0",
-  "description": "MCP server for S.C.A.L.A. Score API — let Claude, ChatGPT, and AI agents search 244M+ companies",
+  "name": "scala-mcp-server",
+  "version": "0.1.1",
+  "description": "MCP server for S.C.A.L.A. Score API — let Claude, ChatGPT, and AI agents search 250M+ companies",
   "type": "module",
   "bin": {
     "scala-mcp": "dist/index.js"
@@ -12,7 +12,15 @@
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts"
   },
-  "keywords": ["mcp", "model-context-protocol", "ai", "claude", "company-data", "scala", "score"],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "claude",
+    "company-data",
+    "scala",
+    "score"
+  ],
   "author": "S.C.A.L.A. AI OS <ale@get-scala.com>",
   "license": "MIT",
   "repository": {
