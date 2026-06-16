@@ -207,10 +207,12 @@ npm run build  # Compile TypeScript
 
 ## Ecosystem
 
-- [S.C.A.L.A. AI OS](https://get-scala.com) -- Full enterprise AI platform
+- **[enrich-companies (npm)](https://www.npmjs.com/package/enrich-companies)** -- CLI to enrich CSV files with company data
+- **[enrich-companies (PyPI)](https://pypi.org/project/enrich-companies/)** -- Same tool, Python version
+- **[Score Company Lookup](https://chromewebstore.google.com/detail/score-company-lookup/)** -- Chrome extension
+- **[scala-score (PyPI)](https://pypi.org/project/scala-score/)** -- Python SDK
+- **[world-company-database](https://github.com/Alessandro114/world-company-database)** -- Bulk dataset (Kaggle + HuggingFace)
 - [Score API Docs](https://app.get-scala.com/api/docs/ui) -- REST API documentation
-- [Python SDK](https://github.com/Alessandro114/scala-score-python) -- Python client
-- [JavaScript SDK](https://github.com/Alessandro114/scala-score-js) -- JS/TS client
 - [n8n Integration](https://github.com/Alessandro114/n8n-nodes-scala) -- n8n workflow nodes
 
 ## License
