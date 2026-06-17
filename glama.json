@@ -1,13 +1,69 @@
 {
   "$schema": "https://glama.ai/schemas/glama.json",
   "name": "scala-mcp-server",
-  "display_name": "SCALA Score — Company Data",
-  "description": "Search and enrich data from 250M+ companies across 50+ countries. Company lookup by name, VAT, or ID, NACE sector search, and financial data from official EU business registries.",
+  "display_name": "S.C.A.L.A. Score — Company Intelligence",
+  "description": "Search, enrich, and analyze 250M+ companies across 50+ countries. Lookup any company by name, VAT number, or keyword. Get detailed profiles with revenue, employees, health scores, and NACE industry classification. Generate financial health reports for due diligence, risk assessment, and competitive analysis.",
+  "icon": "https://get-scala.com/scala-logo.svg",
   "author": {
     "name": "Alessandro Binda",
     "url": "https://get-scala.com"
   },
   "repository": "https://github.com/Alessandro114/scala-mcp-server",
-  "tags": ["company-data", "business-intelligence", "data-enrichment", "financial-data", "eu-registries"],
-  "categories": ["data", "business"]
+  "homepage": "https://get-scala.com/score",
+  "license": "MIT",
+  "tags": [
+    "company-data",
+    "business-intelligence",
+    "data-enrichment",
+    "financial-data",
+    "eu-registries",
+    "company-search",
+    "vat-lookup",
+    "due-diligence",
+    "risk-assessment",
+    "nace-codes"
+  ],
+  "categories": [
+    "data",
+    "business",
+    "analytics",
+    "finance"
+  ],
+  "tools": [
+    {
+      "name": "search_companies",
+      "description": "Search 250M+ companies by name, VAT number, or keyword with country, NACE, and status filters"
+    },
+    {
+      "name": "lookup_company",
+      "description": "Get full company profile by ID or VAT number"
+    },
+    {
+      "name": "company_report",
+      "description": "Generate financial health report (basic/pro/enterprise)"
+    },
+    {
+      "name": "database_stats",
+      "description": "Get database statistics — total companies, countries, last update"
+    },
+    {
+      "name": "list_countries",
+      "description": "List all countries with company counts"
+    },
+    {
+      "name": "check_credits",
+      "description": "Check remaining API credits and plan info"
+    }
+  ],
+  "pricing": {
+    "type": "freemium",
+    "free_tier": "50 credits/month",
+    "paid_plans_url": "https://get-scala.com/score"
+  },
+  "installation": {
+    "command": "npx -y scala-mcp-server",
+    "env": {
+      "SCALA_API_KEY": "Your API key from https://app.get-scala.com"
+    }
+  }
 }

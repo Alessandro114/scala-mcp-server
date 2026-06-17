@@ -1,6 +1,8 @@
 awesome-mcp-servers/
+awesome-mcp-servers-3/
 src/
 tsconfig.json
 .git/
 .github/
 node_modules/
+server.json

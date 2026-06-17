@@ -1,5 +1,5 @@
 <p align="center">
-  <strong>Your AI assistant can now search 250M+ companies across 40+ countries. Free.</strong>
+  <strong>Your AI assistant can now search 250M+ companies across 50+ countries. Free.</strong>
 </p>
 
 <p align="center">
@@ -8,12 +8,13 @@
   <a href="https://www.npmjs.com/package/scala-mcp-server"><img src="https://img.shields.io/npm/dm/scala-mcp-server" alt="npm downloads"></a>
   <a href="https://github.com/Alessandro114/scala-mcp-server/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Alessandro114/scala-mcp-server" alt="License"></a>
   <a href="https://get-scala.com/score"><img src="https://img.shields.io/badge/companies-250M%2B-green" alt="Companies"></a>
+  <a href="https://smithery.ai/server/Alessandro114/scala-mcp-server"><img src="https://smithery.ai/badge/Alessandro114/scala-mcp-server" alt="Smithery"></a>
   <a href="https://glama.ai/mcp/servers/Alessandro114/scala-mcp-server"><img src="https://glama.ai/mcp/servers/Alessandro114/scala-mcp-server/badges/score.svg" alt="Glama Score"></a>
 </p>
 
 # S.C.A.L.A. MCP Server
 
-An [MCP server](https://modelcontextprotocol.io) that gives Claude, ChatGPT, Codex, and any MCP-compatible AI agent access to the [S.C.A.L.A. Score](https://get-scala.com/score) company intelligence database -- 250M+ companies across 40+ countries.
+An [MCP server](https://modelcontextprotocol.io) that gives Claude, ChatGPT, Codex, and any MCP-compatible AI agent access to the [S.C.A.L.A. Score](https://get-scala.com/score) company intelligence database -- 250M+ companies across 50+ countries.
 
 ## Quick Start
 
@@ -35,12 +36,20 @@ SCALA_API_KEY=your-key npx -y scala-mcp-server
 
 Once connected, your AI assistant can:
 
-- **Search companies** by name, VAT number, keyword -- across 40+ countries
+- **Search companies** by name, VAT number, keyword -- across 50+ countries
 - **Lookup** detailed company profiles (revenue, employees, health score, industry)
 - **Generate reports** (financial health, risk assessment, due diligence)
 - **Explore the database** -- stats, country coverage, credit balance
 
 ## Setup
+
+### Smithery (Recommended)
+
+Install automatically via [Smithery](https://smithery.ai/server/Alessandro114/scala-mcp-server):
+
+```bash
+npx @smithery/cli mcp add Alessandro114/scala-mcp-server --config '{"scalaApiKey":"your-api-key"}'
+```
 
 ### Claude Desktop
 
@@ -175,7 +184,7 @@ See [get-scala.com/score](https://get-scala.com/score) for current pricing.
 Your AI Assistant  <-->  MCP Protocol  <-->  scala-mcp-server  <-->  S.C.A.L.A. Score API
                                                                           |
                                                                     250M+ companies
-                                                                    40+ countries
+                                                                    50+ countries
                                                                     NACE industry codes
                                                                     Financial data
 ```

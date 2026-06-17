@@ -1,0 +1,103 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+name: scala-mcp-server
+displayName: "S.C.A.L.A. Score — Company Intelligence"
+description: >-
+  Search, enrich, and analyze 250M+ companies across 50+ countries.
+  Lookup any company by name, VAT number, or keyword. Get detailed
+  profiles with revenue, employees, health scores, and NACE industry
+  classification. Generate financial health reports for due diligence,
+  risk assessment, and competitive analysis. Data sourced from official
+  EU business registries and commercial databases.
+version: 0.1.3
+author: "Alessandro Binda <ale@get-scala.com>"
+license: MIT
+repository: https://github.com/Alessandro114/scala-mcp-server
+
+icon: https://get-scala.com/scala-logo.svg
+category: Data & Analytics
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required:
+      - scalaApiKey
+    properties:
+      scalaApiKey:
+        type: string
+        description: "Your S.C.A.L.A. Score API key. Get one free at https://app.get-scala.com"
+  exampleConfig:
+    scalaApiKey: "sk-your-api-key"
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', 'scala-mcp-server'],
+      env: {
+        SCALA_API_KEY: config.scalaApiKey
+      }
+    })
+
+build:
+  dockerfile: Dockerfile
+
+capabilities:
+  - search_companies:
+      description: "Search 250M+ companies by name, VAT number, or keyword with country, NACE industry, and status filters"
+      alwaysAllow: true
+  - lookup_company:
+      description: "Get full company profile by ID or VAT number — revenue, employees, health score, industry, legal form"
+      alwaysAllow: true
+  - company_report:
+      description: "Generate financial health reports — basic (5 credits), pro (10), enterprise (20)"
+      alwaysAllow: false
+  - database_stats:
+      description: "Database statistics — total companies, countries covered, last update"
+      alwaysAllow: true
+  - list_countries:
+      description: "List all 50+ countries with company counts per country"
+      alwaysAllow: true
+  - check_credits:
+      description: "Check remaining API credits, current plan, and reset date"
+      alwaysAllow: true
+
+documentation:
+  usage: |
+    ## Quick Start
+
+    1. Get a free API key at https://app.get-scala.com (no credit card required)
+    2. Install via Smithery or npx:
+       ```bash
+       npx -y scala-mcp-server
+       ```
+    3. Set your API key as SCALA_API_KEY environment variable
+
+    ## Example Conversations
+
+    **Search companies:**
+    > "Find the top 10 restaurant chains in Italy"
+    → Uses search_companies with query="ristorante catena", country="IT", nace="56.10"
+
+    **Company lookup:**
+    > "Look up Ferrero's financial health"
+    → Uses lookup_company with company_id="IT02727330014"
+
+    **Cross-country comparison:**
+    > "Compare construction companies in Milan vs Munich"
+    → Uses search_companies twice with country="IT" and country="DE"
+
+    ## Pricing
+
+    | Plan       | Credits/mo | Price    |
+    |------------|-----------|----------|
+    | Free       | 50        | €0       |
+    | Starter    | 500       | €9/mo    |
+    | Growth     | 5,000     | €29/mo   |
+    | Enterprise | 50,000+   | Custom   |
+
+compatibility:
+  os:
+    - windows
+    - linux
+    - macos
+  node: ">=18"
