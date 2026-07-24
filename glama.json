@@ -1,64 +1,83 @@
 {
   "$schema": "https://glama.ai/schemas/glama.json",
   "name": "scala-mcp-server",
-  "display_name": "S.C.A.L.A. Score — Company Intelligence",
-  "description": "Search, enrich, and analyze 250M+ companies across 50+ countries. Lookup any company by name, VAT number, or keyword. Get detailed profiles with revenue, employees, health scores, and NACE industry classification. Generate financial health reports for due diligence, risk assessment, and competitive analysis.",
+  "display_name": "S.C.A.L.A. AI OS — Business Operating System for Claude",
+  "description": "Run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant (WhatsApp/email/voice), workflow automation, 19 industry verticals, and 250M+ company intelligence database. The enterprise AI operating system that replaces SAP, Salesforce, and ServiceNow — at a fraction of the cost.",
   "icon": "https://get-scala.com/scala-logo.svg",
   "author": {
     "name": "Alessandro Binda",
     "url": "https://get-scala.com"
   },
   "repository": "https://github.com/Alessandro114/scala-mcp-server",
-  "homepage": "https://get-scala.com/score",
+  "homepage": "https://get-scala.com",
   "license": "MIT",
   "tags": [
+    "business",
+    "crm",
+    "invoicing",
+    "bookings",
+    "ai-assistant",
+    "whatsapp",
     "company-data",
     "business-intelligence",
     "data-enrichment",
-    "financial-data",
-    "eu-registries",
-    "company-search",
-    "vat-lookup",
-    "due-diligence",
-    "risk-assessment",
-    "nace-codes"
+    "enterprise",
+    "saas",
+    "automation",
+    "workflows",
+    "restaurant",
+    "real-estate",
+    "salon",
+    "agency"
   ],
   "categories": [
-    "data",
     "business",
+    "productivity",
+    "data",
     "analytics",
-    "finance"
+    "finance",
+    "crm",
+    "automation"
   ],
   "tools": [
-    {
-      "name": "search_companies",
-      "description": "Search 250M+ companies by name, VAT number, or keyword with country, NACE, and status filters"
-    },
-    {
-      "name": "lookup_company",
-      "description": "Get full company profile by ID or VAT number"
-    },
-    {
-      "name": "company_report",
-      "description": "Generate financial health report (basic/pro/enterprise)"
-    },
-    {
-      "name": "database_stats",
-      "description": "Get database statistics — total companies, countries, last update"
-    },
-    {
-      "name": "list_countries",
-      "description": "List all countries with company counts"
-    },
-    {
-      "name": "check_credits",
-      "description": "Check remaining API credits and plan info"
-    }
+    { "name": "search_companies", "description": "Search 250M+ companies by name, VAT, keyword" },
+    { "name": "lookup_company", "description": "Get full company profile by ID or VAT" },
+    { "name": "company_report", "description": "Generate financial health report" },
+    { "name": "database_stats", "description": "Database statistics" },
+    { "name": "list_countries", "description": "List countries with company counts" },
+    { "name": "check_credits", "description": "Check API credits and plan" },
+    { "name": "crm_list_contacts", "description": "List and search CRM contacts" },
+    { "name": "crm_create_contact", "description": "Create a CRM contact" },
+    { "name": "crm_update_contact", "description": "Update a CRM contact" },
+    { "name": "crm_pipeline", "description": "View sales pipeline" },
+    { "name": "crm_contact_timeline", "description": "Contact activity timeline" },
+    { "name": "booking_get_slots", "description": "Get available booking slots" },
+    { "name": "booking_create", "description": "Create a booking" },
+    { "name": "booking_cancel", "description": "Cancel a booking" },
+    { "name": "invoice_list", "description": "List invoices" },
+    { "name": "invoice_create", "description": "Create an invoice" },
+    { "name": "invoice_send", "description": "Send invoice by email" },
+    { "name": "invoice_get_pdf", "description": "Get invoice PDF" },
+    { "name": "sara_chat", "description": "Chat with SARA AI assistant" },
+    { "name": "sara_conversations", "description": "List SARA conversations" },
+    { "name": "sara_insights", "description": "AI business insights" },
+    { "name": "sara_alerts", "description": "Business alerts" },
+    { "name": "sara_proactive", "description": "Proactive AI suggestions" },
+    { "name": "finance_summary", "description": "Financial overview" },
+    { "name": "finance_health_score", "description": "Business health score" },
+    { "name": "finance_cash_flow", "description": "Cash flow analysis" },
+    { "name": "vertical_kpis", "description": "Vertical-specific KPIs (19 industries)" },
+    { "name": "vertical_list_data", "description": "List records from any vertical" },
+    { "name": "vertical_create_record", "description": "Create record in any vertical" },
+    { "name": "vertical_access", "description": "Check active vertical modules" },
+    { "name": "workflow_list", "description": "List automation workflows" },
+    { "name": "workflow_run", "description": "Execute a workflow" },
+    { "name": "workflow_stats", "description": "Workflow statistics" }
   ],
   "pricing": {
     "type": "freemium",
-    "free_tier": "50 credits/month",
-    "paid_plans_url": "https://get-scala.com/score"
+    "free_tier": "14-day trial on Growth plan",
+    "paid_plans_url": "https://get-scala.com/#pricing"
   },
   "installation": {
     "command": "npx -y scala-mcp-server",

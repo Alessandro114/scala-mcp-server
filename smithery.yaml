@@ -1,21 +1,20 @@
 # Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
 
 name: scala-mcp-server
-displayName: "S.C.A.L.A. Score — Company Intelligence"
+displayName: "S.C.A.L.A. AI OS — Business Operating System"
 description: >-
-  Search, enrich, and analyze 250M+ companies across 50+ countries.
-  Lookup any company by name, VAT number, or keyword. Get detailed
-  profiles with revenue, employees, health scores, and NACE industry
-  classification. Generate financial health reports for due diligence,
-  risk assessment, and competitive analysis. Data sourced from official
-  EU business registries and commercial databases.
-version: 0.1.3
+  Run your entire business from Claude. S.C.A.L.A. is an enterprise AI
+  operating system with CRM, invoicing, bookings, SARA AI assistant (WhatsApp,
+  email, voice), workflow automation, and 19 industry-specific vertical modules
+  (restaurants, real estate, agencies, car dealerships, and more). Includes
+  250M+ company intelligence database for search, enrichment, and due diligence.
+version: 1.0.0
 author: "Alessandro Binda <ale@get-scala.com>"
 license: MIT
 repository: https://github.com/Alessandro114/scala-mcp-server
 
 icon: https://get-scala.com/scala-logo.svg
-category: Data & Analytics
+category: Business & Productivity
 
 startCommand:
   type: stdio
@@ -26,7 +25,10 @@ startCommand:
     properties:
       scalaApiKey:
         type: string
-        description: "Your S.C.A.L.A. Score API key. Get one free at https://app.get-scala.com"
+        description: "Your S.C.A.L.A. API key. Get one free at https://app.get-scala.com"
+      scalaApiUrl:
+        type: string
+        description: "API base URL (optional)"
   exampleConfig:
     scalaApiKey: "sk-your-api-key"
   commandFunction: |-
@@ -34,7 +36,8 @@ startCommand:
       command: 'npx',
       args: ['-y', 'scala-mcp-server'],
       env: {
-        SCALA_API_KEY: config.scalaApiKey
+        SCALA_API_KEY: config.scalaApiKey,
+        ...(config.scalaApiUrl ? { SCALA_API_URL: config.scalaApiUrl } : {})
       }
     })
 
@@ -42,58 +45,154 @@ build:
   dockerfile: Dockerfile
 
 capabilities:
+  # Score (Company Intelligence)
   - search_companies:
-      description: "Search 250M+ companies by name, VAT number, or keyword with country, NACE industry, and status filters"
+      description: "Search 250M+ companies by name, VAT number, or keyword"
       alwaysAllow: true
   - lookup_company:
-      description: "Get full company profile by ID or VAT number — revenue, employees, health score, industry, legal form"
+      description: "Get full company profile by ID or VAT number"
       alwaysAllow: true
   - company_report:
-      description: "Generate financial health reports — basic (5 credits), pro (10), enterprise (20)"
+      description: "Generate financial health reports (5-20 credits)"
       alwaysAllow: false
   - database_stats:
-      description: "Database statistics — total companies, countries covered, last update"
+      description: "Database statistics"
       alwaysAllow: true
   - list_countries:
-      description: "List all 50+ countries with company counts per country"
+      description: "List countries with company counts"
       alwaysAllow: true
   - check_credits:
-      description: "Check remaining API credits, current plan, and reset date"
+      description: "Check API credits and plan"
+      alwaysAllow: true
+  # CRM
+  - crm_list_contacts:
+      description: "List and search CRM contacts"
+      alwaysAllow: true
+  - crm_create_contact:
+      description: "Create a new CRM contact"
+      alwaysAllow: false
+  - crm_update_contact:
+      description: "Update an existing CRM contact"
+      alwaysAllow: false
+  - crm_pipeline:
+      description: "View sales pipeline"
+      alwaysAllow: true
+  - crm_contact_timeline:
+      description: "Get contact activity timeline"
+      alwaysAllow: true
+  # Bookings
+  - booking_get_slots:
+      description: "Get available booking slots"
+      alwaysAllow: true
+  - booking_create:
+      description: "Create a booking"
+      alwaysAllow: false
+  - booking_cancel:
+      description: "Cancel a booking"
+      alwaysAllow: false
+  # Invoicing
+  - invoice_list:
+      description: "List invoices"
+      alwaysAllow: true
+  - invoice_create:
+      description: "Create an invoice"
+      alwaysAllow: false
+  - invoice_send:
+      description: "Send invoice by email"
+      alwaysAllow: false
+  - invoice_get_pdf:
+      description: "Get invoice PDF"
+      alwaysAllow: true
+  # SARA AI
+  - sara_chat:
+      description: "Chat with SARA AI assistant"
+      alwaysAllow: false
+  - sara_conversations:
+      description: "List SARA conversations"
+      alwaysAllow: true
+  - sara_insights:
+      description: "Get AI business insights"
+      alwaysAllow: true
+  - sara_alerts:
+      description: "Get business alerts"
+      alwaysAllow: true
+  - sara_proactive:
+      description: "Get proactive AI suggestions"
+      alwaysAllow: true
+  # Finance
+  - finance_summary:
+      description: "Financial overview"
+      alwaysAllow: true
+  - finance_health_score:
+      description: "Business health score"
+      alwaysAllow: true
+  - finance_cash_flow:
+      description: "Cash flow analysis"
+      alwaysAllow: true
+  # Verticals
+  - vertical_kpis:
+      description: "Get vertical-specific KPIs"
+      alwaysAllow: true
+  - vertical_list_data:
+      description: "List records from any vertical"
+      alwaysAllow: true
+  - vertical_create_record:
+      description: "Create a record in any vertical"
+      alwaysAllow: false
+  - vertical_access:
+      description: "Check active vertical modules"
+      alwaysAllow: true
+  # Workflows
+  - workflow_list:
+      description: "List automation workflows"
+      alwaysAllow: true
+  - workflow_run:
+      description: "Execute a workflow"
+      alwaysAllow: false
+  - workflow_stats:
+      description: "Workflow statistics"
       alwaysAllow: true
 
 documentation:
   usage: |
     ## Quick Start
 
-    1. Get a free API key at https://app.get-scala.com (no credit card required)
-    2. Install via Smithery or npx:
-       ```bash
-       npx -y scala-mcp-server
-       ```
-    3. Set your API key as SCALA_API_KEY environment variable
+    1. Get a free API key at https://app.get-scala.com
+    2. Install: `npx -y scala-mcp-server`
+    3. Set SCALA_API_KEY environment variable
 
-    ## Example Conversations
+    ## What You Can Do
 
-    **Search companies:**
-    > "Find the top 10 restaurant chains in Italy"
-    → Uses search_companies with query="ristorante catena", country="IT", nace="56.10"
+    **Company Intelligence** (250M+ companies, 50+ countries)
+    > "Find the top restaurant chains in Germany"
+    > "Look up Tesla's financial health"
 
-    **Company lookup:**
-    > "Look up Ferrero's financial health"
-    → Uses lookup_company with company_id="IT02727330014"
+    **CRM & Sales**
+    > "Show my sales pipeline"
+    > "Create a contact for John Smith at Acme Corp"
 
-    **Cross-country comparison:**
-    > "Compare construction companies in Milan vs Munich"
-    → Uses search_companies twice with country="IT" and country="DE"
+    **Bookings**
+    > "What slots are available tomorrow?"
+    > "Book a haircut for Maria at 3pm"
 
-    ## Pricing
+    **Invoicing**
+    > "Show overdue invoices"
+    > "Create an invoice for the Johnson project"
 
-    | Plan       | Credits/mo | Price    |
-    |------------|-----------|----------|
-    | Free       | 50        | €0       |
-    | Starter    | 500       | €9/mo    |
-    | Growth     | 5,000     | €29/mo   |
-    | Enterprise | 50,000+   | Custom   |
+    **SARA AI Assistant**
+    > "Ask SARA about last month's revenue"
+    > "What business insights does SARA have?"
+
+    **Finance**
+    > "What's my business health score?"
+    > "Show cash flow for the last 6 months"
+
+    **Industry Verticals** (19 modules)
+    > "Show restaurant KPIs for today"
+    > "List all vehicles in the dealership"
+
+    **Workflows**
+    > "Run the weekly report workflow"
 
 compatibility:
   os:
