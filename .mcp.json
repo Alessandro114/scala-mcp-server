@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "scala": {
+      "command": "npx",
+      "args": ["-y", "scala-mcp-server"],
+      "env": {
+        "SCALA_API_KEY": "${SCALA_API_KEY}"
+      }
+    }
+  }
+}

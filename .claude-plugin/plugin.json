@@ -1,0 +1,12 @@
+{
+  "name": "scala",
+  "description": "S.C.A.L.A. AI OS — Run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant, 19 industry verticals, 250M+ company database.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Alessandro Binda",
+    "email": "ale@get-scala.com"
+  },
+  "homepage": "https://get-scala.com",
+  "repository": "https://github.com/Alessandro114/scala-mcp-server",
+  "license": "MIT"
+}
