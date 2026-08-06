@@ -5,7 +5,7 @@
 <h1 align="center">S.C.A.L.A. MCP Server</h1>
 
 <p align="center">
-  <strong>Run your entire business from Claude. 33 tools. 19 industries. 250M+ companies.</strong>
+  <strong>Run your entire business from Claude. 33 tools. 20 industries. 250M+ companies.</strong>
 </p>
 
 <p align="center">
@@ -65,7 +65,7 @@ SCALA_API_KEY=your-key npx -y scala-mcp-server
 > "Show cash flow for the last 6 months"
 > "Give me a financial summary"
 
-### 19 Industry Verticals
+### 20 Industry Verticals
 > "Show restaurant KPIs — covers, avg ticket, food cost"
 > "List all vehicles in the dealership inventory"
 > "What are this month's real estate commissions?"
@@ -222,7 +222,7 @@ The server exposes static resources that Claude can read for context:
 | Resource | URI | Description |
 |----------|-----|-------------|
 | Pricing | `scala://pricing` | Current plans, enterprise tiers, add-ons |
-| Verticals | `scala://verticals` | All 19 industry modules with features |
+| Verticals | `scala://verticals` | All 20 industry modules with features |
 | Capabilities | `scala://capabilities` | Full platform feature list |
 
 ---
@@ -273,18 +273,29 @@ Your AI  <-->  MCP Protocol  <-->  scala-mcp-server  <-->  S.C.A.L.A. API
                               33 tools + 3 resources + 3 prompts
                                         |
                     CRM - Invoicing - Bookings - SARA AI - Finance
-                    Workflows - 19 Verticals - 250M+ Companies
+                    Workflows - 20 Verticals - 250M+ Companies
 ```
 
 ## Ecosystem
 
 - **[enrich-companies (npm)](https://www.npmjs.com/package/enrich-companies)** — CLI to enrich CSV files with company data
 - **[enrich-companies (PyPI)](https://pypi.org/project/enrich-companies/)** — Same tool, Python version
-- **[Score Company Lookup](https://chromewebstore.google.com/detail/score-company-lookup/)** — Chrome extension
 - **[scala-score (PyPI)](https://pypi.org/project/scala-score/)** — Python SDK
-- **[world-company-database](https://github.com/Alessandro114/world-company-database)** — Bulk dataset (Kaggle + HuggingFace)
-- [Score API Docs](https://app.get-scala.com/api/docs/ui) — REST API documentation
-- [n8n Integration](https://github.com/Alessandro114/n8n-nodes-scala) — n8n workflow nodes
+- **[world-company-database](https://github.com/Alessandro114/world-company-database)** — Curated list of 40+ free company databases
+- **[Score API Docs](https://alessandro114.github.io/score-api-docs/)** — REST API documentation
+- **[n8n Integration](https://github.com/Alessandro114/n8n-nodes-scala)** — n8n workflow nodes
+
+## Claude Plugin Skills
+
+The server includes 5 pre-built skills for Claude Code (in `skills/`):
+
+| Skill | What it does |
+|-------|-------------|
+| `/scala:daily-briefing` | Morning briefing — alerts, invoices, pipeline, KPIs, AI suggestions |
+| `/scala:business-health` | Health score + cash flow + recommendations |
+| `/scala:competitor-intel` | Competitor research from 250M+ companies |
+| `/scala:prospect-research` | Pre-meeting company deep dive + talking points |
+| `/scala:invoice-chase` | Overdue invoices grouped 30/60/90+ days + send reminders |
 
 ## Development
 
