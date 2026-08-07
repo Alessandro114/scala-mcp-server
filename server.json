@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Alessandro114/scala-ai-os",
-  "description": "MCP server for S.C.A.L.A. AI OS — run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant, 19 industry verticals, 250M+ company database.",
+  "description": "MCP server for S.C.A.L.A. AI OS — run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant, 20 industry verticals, 250M+ company database.",
   "repository": {
     "url": "https://github.com/Alessandro114/scala-mcp-server",
     "source": "github"

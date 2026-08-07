@@ -5,7 +5,7 @@ displayName: "S.C.A.L.A. AI OS — Business Operating System"
 description: >-
   Run your entire business from Claude. S.C.A.L.A. is an enterprise AI
   operating system with CRM, invoicing, bookings, SARA AI assistant (WhatsApp,
-  email, voice), workflow automation, and 19 industry-specific vertical modules
+  email, voice), workflow automation, and 20 industry-specific vertical modules
   (restaurants, real estate, agencies, car dealerships, and more). Includes
   250M+ company intelligence database for search, enrichment, and due diligence.
 version: 1.0.0
@@ -187,7 +187,7 @@ documentation:
     > "What's my business health score?"
     > "Show cash flow for the last 6 months"
 
-    **Industry Verticals** (19 modules)
+    **Industry Verticals** (20 modules)
     > "Show restaurant KPIs for today"
     > "List all vehicles in the dealership"
 

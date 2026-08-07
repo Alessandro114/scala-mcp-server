@@ -2,7 +2,7 @@
   "$schema": "https://glama.ai/schemas/glama.json",
   "name": "scala-mcp-server",
   "display_name": "S.C.A.L.A. AI OS — Business Operating System for Claude",
-  "description": "Run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant (WhatsApp/email/voice), workflow automation, 19 industry verticals, and 250M+ company intelligence database. The enterprise AI operating system that replaces SAP, Salesforce, and ServiceNow — at a fraction of the cost.",
+  "description": "Run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant (WhatsApp/email/voice), workflow automation, 20 industry verticals, and 250M+ company intelligence database. The enterprise AI operating system that replaces SAP, Salesforce, and ServiceNow — at a fraction of the cost.",
   "icon": "https://get-scala.com/scala-logo.svg",
   "author": {
     "name": "Alessandro Binda",
@@ -66,7 +66,7 @@
     { "name": "finance_summary", "description": "Financial overview" },
     { "name": "finance_health_score", "description": "Business health score" },
     { "name": "finance_cash_flow", "description": "Cash flow analysis" },
-    { "name": "vertical_kpis", "description": "Vertical-specific KPIs (19 industries)" },
+    { "name": "vertical_kpis", "description": "Vertical-specific KPIs (20 industries)" },
     { "name": "vertical_list_data", "description": "List records from any vertical" },
     { "name": "vertical_create_record", "description": "Create record in any vertical" },
     { "name": "vertical_access", "description": "Check active vertical modules" },

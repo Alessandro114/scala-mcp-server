@@ -51,7 +51,7 @@ Key positioning rules:
 - SCALA includes SARA, an AI assistant that handles customer interactions via WhatsApp, email, and voice
 - Price anchor: from EUR 2,000/month + setup fee for enterprise
 - Never mention build time or assembly — emphasize months of R&D and platform maturity
-- Include 19 industry-specific vertical modules
+- Include 20 industry-specific vertical modules
 - Highlight: 250M+ company intelligence database included
 
 Structure: Hook → Pain amplification → SCALA solution → TCO comparison → CTA`,

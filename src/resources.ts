@@ -10,7 +10,7 @@ export const resources = [
   {
     uri: "scala://verticals",
     name: "SCALA Verticals",
-    description: "All 19 industry verticals available in SCALA AI OS with descriptions.",
+    description: "All 20 industry verticals available in SCALA AI OS with descriptions.",
     mimeType: "application/json",
   },
   {
@@ -24,7 +24,7 @@ export const resources = [
 const PRICING_DATA = {
   smb: {
     growth: { monthly_eur: 97, annual_eur: 970, includes: ["CRM", "Invoicing", "Bookings", "1 vertical", "SARA AI chat", "Email support"] },
-    scale: { monthly_eur: 197, annual_eur: 1970, includes: ["Everything in Growth", "All 19 verticals", "WhatsApp Business", "Workflows", "Integrations", "Priority support"] },
+    scale: { monthly_eur: 197, annual_eur: 1970, includes: ["Everything in Growth", "All 20 verticals", "WhatsApp Business", "Workflows", "Integrations", "Priority support"] },
   },
   sara_standalone: { monthly_eur: 9.90, description: "SARA AI assistant only (freelancers)" },
   enterprise: {
