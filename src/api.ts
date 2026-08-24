@@ -1,7 +1,12 @@
-const API_KEY = process.env.SCALA_API_KEY || "";
-const BASE_URL = (process.env.SCALA_API_URL || process.env.SCALA_BASE_URL || "https://app.get-scala.com").replace(/\/$/, "");
+// Letti a ogni chiamata e non una volta sola all'import: un server MCP resta
+// acceso per ore, e una chiave ruotata o un indirizzo cambiato devono avere
+// effetto senza riavviarlo. Prima erano costanti di modulo, quindi il valore
+// era quello del momento in cui Claude Desktop ha caricato il processo.
+const apiKey = () => process.env.SCALA_API_KEY || "";
+const baseUrl = () =>
+  (process.env.SCALA_API_URL || process.env.SCALA_BASE_URL || "https://app.get-scala.com").replace(/\/$/, "");
 
-if (!API_KEY) {
+if (!apiKey()) {
   console.error("Warning: SCALA_API_KEY not set. Some tools require authentication.");
   console.error("Get your API key at https://app.get-scala.com → Settings → API Keys");
 }
@@ -12,7 +17,7 @@ export async function apiRequest(
   method = "GET",
   body?: unknown
 ) {
-  let url = `${BASE_URL}${endpoint}`;
+  let url = `${baseUrl()}${endpoint}`;
   if (params) {
     const qs = new URLSearchParams(
       Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined && v !== ""))
@@ -23,7 +28,7 @@ export async function apiRequest(
   const init: RequestInit = {
     method,
     headers: {
-      "X-API-Key": API_KEY,
+      "X-API-Key": apiKey(),
       "Content-Type": "application/json",
     },
   };

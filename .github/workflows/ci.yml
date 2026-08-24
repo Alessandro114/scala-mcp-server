@@ -1,0 +1,17 @@
+name: CI
+on:
+  push: { branches: [main, master] }
+  pull_request:
+
+jobs:
+  prova:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      # npm ci e non npm install: un package-lock disallineato deve fallire
+      # qui, non su Claude Desktop di chi installa il server.
+      - run: npm ci
+      - run: npm run build
+      - run: npm test

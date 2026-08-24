@@ -67,7 +67,7 @@ Structure: Hook → Pain amplification → SCALA solution → TCO comparison →
             role: "user" as const,
             content: {
               type: "text" as const,
-              text: `Perform a comprehensive business analysis for "${a.company_name}"${a.country ? ` in ${a.country}` : ""}.
+              text: `Perform a comprehensive business analysis for "${a.company_name || "the company"}"${a.country ? ` in ${a.country}` : ""}.
 
 Use the available SCALA tools to:
 1. Search for the company using search_companies

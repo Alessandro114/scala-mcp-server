@@ -1,9 +1,12 @@
-node_modules/
-dist/
+# .env.example is tracked intentionally
 *.js.map
+*.tgz
+.DS_Store
 .env
 .env.local
 .env.production
-# .env.example is tracked intentionally
-*.tgz
-.DS_Store
+coverage/
+dist/
+dist/
+node_modules/
+node_modules/
