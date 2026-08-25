@@ -4,6 +4,9 @@
 // falsa, che e peggio.
 
 import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { prompts, handlePrompt } from "../src/prompts.js";
 import { resources, handleResource } from "../src/resources.js";
 
@@ -180,5 +183,25 @@ describe("gli aiuti di formattazione delle risposte", () => {
         const r = ok({ a: 1 });
         expect(r.content[0].type).toBe("text");
         expect(JSON.parse(r.content[0].text)).toEqual({ a: 1 });
+    });
+});
+
+describe('il README dice la verita sui numeri', () => {
+    // Stesso principio applicato oggi su scala-agent-definitions e su sara,
+    // dove i README dichiaravano 79 strumenti su 80 e 87 su 83: un numero
+    // scritto a mano invecchia in silenzio, e chi valuta il progetto lo conta.
+    const readme = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'README.md'), 'utf8');
+
+    it('il numero di strumenti dichiarato corrisponde a quelli registrati', async () => {
+        const moduli = await Promise.all([
+            import('../src/tools/score.js'), import('../src/tools/crm.js'),
+            import('../src/tools/booking.js'), import('../src/tools/invoice.js'),
+            import('../src/tools/sara.js'), import('../src/tools/finance.js'),
+            import('../src/tools/verticals.js'), import('../src/tools/workflows.js'),
+        ]);
+        const reali = (moduli.flatMap(m => Object.values(m).find(Array.isArray) ?? []) as unknown[]).length;
+        const citazioni = [...readme.matchAll(/(\d+)\s+tools\b/gi)].map(m => Number(m[1]));
+        expect(citazioni.length, 'nessuna citazione "N tools" nel README').toBeGreaterThan(0);
+        for (const n of citazioni) expect(n).toBe(reali);
     });
 });

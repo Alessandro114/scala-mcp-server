@@ -9,6 +9,8 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Alessandro114/scala-mcp-server/actions/workflows/ci.yml"><img src="https://github.com/Alessandro114/scala-mcp-server/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/Alessandro114/scala-mcp-server/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/coverage-98.8%25-brightgreen" alt="Coverage"></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-compatible-purple" alt="MCP"></a>
   <a href="https://www.npmjs.com/package/scala-mcp-server"><img src="https://img.shields.io/npm/v/scala-mcp-server" alt="npm version"></a>
   <a href="https://www.npmjs.com/package/scala-mcp-server"><img src="https://img.shields.io/npm/dm/scala-mcp-server" alt="npm downloads"></a>
