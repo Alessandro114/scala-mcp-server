@@ -6,11 +6,11 @@ export default defineConfig({
             provider: 'v8',
             include: ['src/**/*.ts'],
             reporter: ['text', 'lcov'],
-            // Non 100 perche main() e la guardia sull'entry point girano solo
-            // quando il processo E il server: coprirle vorrebbe dire avviare
-            // un trasporto stdio dentro un test, cioe provare Node, non noi.
-            // Tutto il resto e al 100% ed e li che la soglia morde.
-            thresholds: { statements: 98, branches: 98, functions: 92, lines: 98 },
+            // 100 su tutto. main() e la guardia sull entry point sono marcate
+            // con "v8 ignore" e verificate da test/avvio.test.ts, che lancia
+            // l eseguibile come processo separato: lo strumento misura il
+            // processo dei test, non i figli.
+            thresholds: { statements: 100, branches: 100, functions: 100, lines: 100 },
         },
     },
 });

@@ -121,6 +121,15 @@ server.setRequestHandler(GetPromptRequestSchema, async (request) => {
 
 // ── START ─────────────────────────────────────────────────────────────────────
 
+/* v8 ignore start -- verificato da test/avvio.test.ts, che lancia
+   `node dist/index.js` come processo separato e ci parla sopra lo stdio con il
+   protocollo MCP. Lo strumento di copertura misura il processo dei test, non i
+   figli, quindi queste righe risultano scoperte pur essendo provate.
+
+   Non sono coprribili da dentro per costruzione: la guardia qui sotto esiste
+   proprio per NON avviare il server quando qualcuno importa il modulo. Un test
+   che le eseguisse in-process si prenderebbe un trasporto stdio e resterebbe
+   appeso. */
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
@@ -140,3 +149,4 @@ if (eseguitoDirettamente) {
     process.exit(1);
   });
 }
+/* v8 ignore stop */
