@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
+        with: { node-version: '22' }
       # npm ci e non npm install: un package-lock disallineato deve fallire
       # qui, non su Claude Desktop di chi installa il server.
       - run: npm ci
