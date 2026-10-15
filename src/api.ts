@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import crypto from "node:crypto";
 
 /**
  * Modalita' remota (server HTTP multi-utente): MCP_REMOTE=1. Qui NESSUNA credenziale
@@ -7,6 +8,15 @@ import { AsyncLocalStorage } from "node:async_hooks";
  */
 export const REMOTE = process.env.MCP_REMOTE === "1";
 const credenziale = new AsyncLocalStorage<{ token: string }>();
+
+/**
+ * Identita' per il rate limit del backend (che chiave per `cf-connecting-ip`). Tutto il traffico del
+ * server MCP parte da un solo indirizzo: senza questo, tutti gli utenti dividerebbero un solo secchio.
+ * Il valore dipende dal token, quindi e' per-utente; e' un identificatore, non il token.
+ */
+export function identitaRateLimit(token: string): string {
+  return "mcp-" + crypto.createHash("sha256").update(token).digest("hex").slice(0, 16);
+}
 
 /** Esegue `fn` con il token dell'utente della richiesta corrente (solo modalita' remota). */
 export function conCredenziale<T>(token: string, fn: () => T): T {
@@ -23,7 +33,8 @@ function chiaveCorrente(): string {
 /** Un segmento di percorso fornito dal modello: sempre codificato, mai vuoto. */
 export function seg(value: unknown): string {
   const v = String(value ?? "").trim();
-  if (!v || v.length > 200) throw new Error("Invalid identifier");
+  // "." e ".." sopravvivono a encodeURIComponent e fetch li normalizza: sposterebbero la richiesta su un'altra rotta.
+  if (!v || v.length > 200 || v === "." || v === ".." || /[\u0000-\u001f]/.test(v)) throw new Error("Invalid identifier");
   return encodeURIComponent(v);
 }
 
@@ -58,6 +69,7 @@ export async function apiRequest(
     headers: {
       "X-API-Key": chiaveCorrente(),
       "Content-Type": "application/json",
+      ...(REMOTE ? { "cf-connecting-ip": identitaRateLimit(chiaveCorrente()) } : {}),
     },
   };
   if (body) init.body = JSON.stringify(body);

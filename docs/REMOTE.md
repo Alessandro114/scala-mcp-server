@@ -9,8 +9,10 @@ Streamable HTTP, stateless, **sola lettura (v1)**. Codice: `src/remote.ts`. Il s
 2. Claude scopre l'authorization server (backend, `src/routes/mcpOauth.ts`), fa OAuth 2.0 + PKCE S256
    (registrazione dinamica del client, consenso dell'utente loggato nell'app) e ottiene un access
    token a scadenza breve (scope `mcp:read`) piu' un refresh token ruotato.
-3. Ogni richiesta MCP porta il Bearer. Il server lo valida sul backend (`/api/auth/me`, cache 20 s per
-   i soli esiti positivi) e lo inoltra come `X-API-Key`: autenticazione, rate limit, scope e RLS sono
+3. Ogni richiesta MCP porta il Bearer. Il server lo valida sul backend (`/api/mcp-oauth/whoami`; cache 20 s per gli esiti positivi,
+   60 s per i negativi, richieste identiche fuse, al massimo 16 validazioni concorrenti, stop per IP dopo 30
+   token non validi al minuto) e lo inoltra come `X-API-Key` (con `cf-connecting-ip: mcp-<hash>` per-token, cosi' il limite per IP del backend
+   non e' condiviso da tutti gli utenti): autenticazione, rate limit, scope e RLS sono
    quelli del backend. **Nessuna credenziale viene letta dall'ambiente in modalita' remota.**
 
 ## Tool esposti in v1 (16, tutti `readOnlyHint`)

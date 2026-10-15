@@ -19,7 +19,7 @@ if (process.env.MCP_REMOTE !== "1") {
   process.exit(1);
 }
 
-const { conCredenziale } = await import("./api.js");
+const { conCredenziale, identitaRateLimit } = await import("./api.js");
 const { createServer } = await import("./server.js");
 
 const PORT = parseInt(process.env.PORT || "3030", 10);
@@ -39,28 +39,73 @@ const METADATA_URL = `${PUBLIC_URL}/.well-known/oauth-protected-resource`;
 
 const sha = (s: string) => crypto.createHash("sha256").update(s).digest("hex");
 
-// ── validazione del token (cache breve: solo gli esiti positivi) ─────────────
+// ── validazione del token ────────────────────────────────────────────────────
+// Cache breve degli esiti positivi (20 s) e NEGATIVA (60 s): un token inventato non deve costare una
+// chiamata al backend a ogni richiesta. Richieste identiche in corso si fondono in una sola.
 const validi = new Map<string, number>();
+const invalidi = new Map<string, number>();
+const inCorso = new Map<string, Promise<Esito>>();
+let validazioniAttive = 0;
+const MAX_VALIDAZIONI = parseInt(process.env.MCP_MAX_VALIDATIONS || "16", 10);
+const NEG_TTL_MS = 60_000;
 
 type Esito = "ok" | "invalid" | "unavailable";
 
-async function validaToken(token: string): Promise<Esito> {
-  const h = sha(token);
-  const scade = validi.get(h);
-  if (scade && scade > Date.now()) return "ok";
+async function chiediAlBackend(token: string): Promise<Esito> {
   try {
-    const r = await fetch(`${BACKEND}/api/auth/me`, {
-      headers: { "X-API-Key": token },
+    const r = await fetch(`${BACKEND}/api/mcp-oauth/whoami`, {
+      headers: { "X-API-Key": token, "cf-connecting-ip": identitaRateLimit(token) },
       signal: AbortSignal.timeout(8000),
     });
     if (r.status === 401 || r.status === 403) return "invalid";
     if (!r.ok) return "unavailable";
-    if (validi.size > 5000) validi.clear();
-    validi.set(h, Date.now() + VALIDATION_TTL_MS);
     return "ok";
   } catch {
     return "unavailable";
   }
+}
+
+async function validaToken(token: string): Promise<Esito> {
+  const h = sha(token);
+  const ora = Date.now();
+  if ((validi.get(h) ?? 0) > ora) return "ok";
+  if ((invalidi.get(h) ?? 0) > ora) return "invalid";
+  const gia = inCorso.get(h);
+  if (gia) return gia;
+  if (validazioniAttive >= MAX_VALIDAZIONI) return "unavailable";
+  validazioniAttive += 1;
+  const p = chiediAlBackend(token).then((e) => {
+    if (e === "ok") { if (validi.size > 5000) validi.clear(); validi.set(h, Date.now() + VALIDATION_TTL_MS); }
+    if (e === "invalid") { if (invalidi.size > 5000) invalidi.clear(); invalidi.set(h, Date.now() + NEG_TTL_MS); }
+    return e;
+  }).finally(() => { validazioniAttive -= 1; inCorso.delete(h); });
+  inCorso.set(h, p);
+  return p;
+}
+
+// ── tentativi con token non valido, per indirizzo (prima di disturbare il backend) ──
+const MAX_FALLITI_MIN = parseInt(process.env.MCP_MAX_BAD_TOKENS_PER_MIN || "30", 10);
+const falliti = new Map<string, { inizio: number; n: number }>();
+function ipClient(req: http.IncomingMessage): string {
+  const s = req.socket.remoteAddress || "?";
+  // nginx sul server stesso: ci si fida dell'inoltro solo se la connessione e' locale
+  if (s === "127.0.0.1" || s === "::1" || s === "::ffff:127.0.0.1") {
+    const cf = req.headers["cf-connecting-ip"];
+    const x = req.headers["x-forwarded-for"];
+    const first = ((Array.isArray(cf) ? cf[0] : cf) || (Array.isArray(x) ? x[0] : x))?.split(",")[0]?.trim();
+    if (first) return first.slice(0, 64);
+  }
+  return s;
+}
+function troppiFalliti(ip: string): boolean {
+  const f = falliti.get(ip);
+  return !!f && Date.now() - f.inizio <= 60_000 && f.n >= MAX_FALLITI_MIN;
+}
+function segnalaFallito(ip: string): void {
+  const ora = Date.now();
+  const f = falliti.get(ip);
+  if (!f || ora - f.inizio > 60_000) { if (falliti.size > 5000) falliti.clear(); falliti.set(ip, { inizio: ora, n: 1 }); }
+  else f.n += 1;
 }
 
 // ── rate limit per token (finestra di un minuto, in memoria) ─────────────────
@@ -141,8 +186,11 @@ export const httpServer = http.createServer(async (req, res) => {
     const token = m[1];
     const h = sha(token);
 
+    const ip = ipClient(req);
+    // Chi ha gia un token riconosciuto valido non viene mai fermato dal contatore dei tentativi falliti.
+    if (!((validi.get(h) ?? 0) > Date.now()) && troppiFalliti(ip)) return json(res, 429, { error: "rate_limited" }, { "Retry-After": "60" });
     const esito = await validaToken(token);
-    if (esito === "invalid") return non401(res);
+    if (esito === "invalid") { segnalaFallito(ip); return non401(res); }
     if (esito === "unavailable") return json(res, 503, { error: "backend_unavailable" }, { "Retry-After": "5" });
     if (!entro(h)) return json(res, 429, { error: "rate_limited" }, { "Retry-After": "60" });
     if (inflight >= MAX_INFLIGHT) return json(res, 503, { error: "busy" }, { "Retry-After": "2" });

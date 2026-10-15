@@ -8,7 +8,7 @@ import type { AddressInfo } from "node:net";
 const TOK_A = "tok_AAAAAAAAAAAAAAAAAAAAAAAA";
 const TOK_B = "tok_BBBBBBBBBBBBBBBBBBBBBBBB";
 const TOK_DOWN = "tok_DOWNDOWNDOWNDOWNDOWNDOWN";
-const seen: { key: string; url: string; method: string }[] = [];
+const seen: { key: string; url: string; method: string; ip: string }[] = [];
 let backend: http.Server;
 let remote: http.Server;
 let base = "";
@@ -16,9 +16,9 @@ let base = "";
 before(async () => {
   backend = http.createServer((req, res) => {
     const key = String(req.headers["x-api-key"] || "");
-    seen.push({ key, url: req.url || "", method: req.method || "" });
+    seen.push({ key, url: req.url || "", method: req.method || "", ip: String(req.headers["cf-connecting-ip"] || "") });
     const send = (s: number, b: unknown) => { res.writeHead(s, { "Content-Type": "application/json" }); res.end(JSON.stringify(b)); };
-    if (req.url === "/api/auth/me") {
+    if (req.url === "/api/mcp-oauth/whoami") {
       if (key === TOK_DOWN) return send(500, { error: "boom" });
       return key === TOK_A || key === TOK_B ? send(200, { user: { id: key } }) : send(401, { error: "no" });
     }
@@ -32,6 +32,7 @@ before(async () => {
   process.env.SCALA_API_KEY = "env-key-MUST-NEVER-LEAK-0000";
   process.env.SCORE_API_KEY = "env-score-key-MUST-NEVER-LEAK";
   process.env.MCP_PUBLIC_URL = "https://mcp.test.example";
+  process.env.MCP_MAX_BAD_TOKENS_PER_MIN = "5";
   process.env.MCP_OAUTH_ISSUER = "https://auth.test.example";
   const m = await import("./remote.js");
   remote = m.httpServer;
@@ -97,7 +98,7 @@ test("un tool fuori allowlist non e' eseguibile nemmeno chiamandolo per nome", a
   const j = (await r.json()) as { result: { isError: boolean; content: { text: string }[] } };
   assert.equal(j.result.isError, true);
   assert.match(j.result.content[0].text, /Unknown tool/);
-  assert.equal(seen.filter((s) => s.method !== "GET" || s.url !== "/api/auth/me").length, 0); // il backend non e' stato toccato
+  assert.equal(seen.filter((s) => s.method !== "GET" || s.url !== "/api/mcp-oauth/whoami").length, 0); // il backend non e' stato toccato
 });
 
 test("isolamento: 40 chiamate parallele con due token vedono SEMPRE e SOLO la propria identita'", async () => {
@@ -140,6 +141,39 @@ test("Origin da browser rifiutato; GET/DELETE non ammessi (stateless); corpo tro
   assert.equal(rotto.status, 400);
   assert.equal((await fetch(`${base}/altro`)).status, 404);
   assert.equal((await fetch(`${base}/healthz`)).status, 200);
+});
+
+test("il backend riceve un'identita' di rate limit per-token (non l'IP condiviso del server MCP)", async () => {
+  seen.length = 0;
+  await rpc(TOK_A, "tools/call", { name: "finance_summary", arguments: {} }, 11);
+  await rpc(TOK_B, "tools/call", { name: "finance_summary", arguments: {} }, 12);
+  const ipA = seen.find((s) => s.key === TOK_A)!.ip;
+  const ipB = seen.find((s) => s.key === TOK_B)!.ip;
+  assert.match(ipA, /^mcp-[0-9a-f]{16}$/);
+  assert.match(ipB, /^mcp-[0-9a-f]{16}$/);
+  assert.notEqual(ipA, ipB);
+  assert.ok(!ipA.includes(TOK_A));
+});
+
+test("'.' e '..' come identificativo sono rifiutati (non si sposta la richiesta su un'altra rotta)", async () => {
+  seen.length = 0;
+  for (const id of ["..", "."]) {
+    const r = await rpc(TOK_A, "tools/call", { name: "crm_contact_timeline", arguments: { contact_id: id } });
+    assert.equal(((await r.json()) as { result: { isError: boolean } }).result.isError, true);
+  }
+  assert.equal(seen.filter((s) => s.url.includes("timeline")).length, 0);
+});
+
+test("token inventato: un solo giro al backend (cache negativa), poi stop per IP dopo 5 tentativi; i token validi passano sempre", async () => {
+  seen.length = 0;
+  const falso = "tok_FALSOFALSOFALSOFALSOFALSO";
+  assert.equal((await rpc(falso, "tools/list")).status, 401);
+  assert.equal((await rpc(falso, "tools/list")).status, 401);
+  assert.equal(seen.filter((s) => s.key === falso).length, 1, "la seconda volta non deve disturbare il backend");
+  let ultimo = 0;
+  for (let i = 0; i < 8; i++) ultimo = (await rpc(`tok_X${i}XXXXXXXXXXXXXXXXXXXXXXX`, "tools/list")).status;
+  assert.equal(ultimo, 429);
+  assert.equal((await rpc(TOK_A, "tools/list")).status, 200, "un token valido non e' mai bloccato dal contatore dei falliti");
 });
 
 test("tool di Score non esposti e, anche se chiamati dal codice, rifiutano in modalita' remota", async () => {
