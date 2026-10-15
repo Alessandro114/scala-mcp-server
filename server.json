@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Alessandro114/scala-ai-os",
-  "description": "MCP server for S.C.A.L.A. AI OS — run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant, 20 industry verticals, 250M+ company database.",
+  "description": "MCP server for S.C.A.L.A. AI OS — run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant, 20 industry verticals, company database (249M records; financials only FR NO LT EE LV CO).",
   "repository": {
     "url": "https://github.com/Alessandro114/scala-mcp-server",
     "source": "github"
@@ -22,6 +22,20 @@
           "format": "string",
           "isSecret": true,
           "name": "SCALA_API_KEY"
+        },
+        {
+          "description": "Score API key for company data (free: https://score.get-scala.com/builders). Falls back to SCALA_API_KEY.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "SCORE_API_KEY"
+        },
+        {
+          "description": "Score API base URL (optional, defaults to https://score.get-scala.com/api/v1)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false,
+          "name": "SCORE_API_URL"
         },
         {
           "description": "API base URL (optional, defaults to https://app.get-scala.com)",

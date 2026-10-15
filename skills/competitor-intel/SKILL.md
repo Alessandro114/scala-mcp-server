@@ -1,5 +1,5 @@
 ---
-description: Research competitors using SCALA's 250M+ company database — search by industry, compare financials, and generate competitive positioning analysis.
+description: Research competitors using SCALA's company database (financials only for FR, NO, LT, EE, LV, CO) — search by name or tax id, compare available financials, and generate competitive positioning analysis.
 ---
 
 # Competitive Intelligence Report
@@ -11,9 +11,9 @@ The user provides: company name or industry, country (default IT), number of com
 Use $ARGUMENTS if provided.
 
 ## Steps
-1. Call `search_companies` with the industry NACE code and country
+1. Call `search_companies` with the company name (or tax_id) and country
 2. Call `lookup_company` for each top result
-3. Optionally call `company_report` for the most interesting competitor
+3. Financials exist only for FR, NO, LT, EE, LV, CO (`financials_withheld` elsewhere); label `revenue_type` reported/estimated
 
 ## Output Format
 Comparison table:

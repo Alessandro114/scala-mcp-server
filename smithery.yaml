@@ -7,7 +7,7 @@ description: >-
   operating system with CRM, invoicing, bookings, SARA AI assistant (WhatsApp,
   email, voice), workflow automation, and 20 industry-specific vertical modules
   (restaurants, real estate, agencies, car dealerships, and more). Includes
-  250M+ company intelligence database for search, enrichment, and due diligence.
+  company intelligence database (financials only FR NO LT EE LV CO) for search, enrichment, and due diligence.
 version: 1.0.0
 author: "Alessandro Binda <ale@get-scala.com>"
 license: MIT
@@ -26,6 +26,9 @@ startCommand:
       scalaApiKey:
         type: string
         description: "Your S.C.A.L.A. API key. Get one free at https://app.get-scala.com"
+      scoreApiKey:
+        type: string
+        description: "Score API key for company data (free: https://score.get-scala.com/builders)"
       scalaApiUrl:
         type: string
         description: "API base URL (optional)"
@@ -37,6 +40,7 @@ startCommand:
       args: ['-y', 'scala-mcp-server'],
       env: {
         SCALA_API_KEY: config.scalaApiKey,
+        ...(config.scoreApiKey ? { SCORE_API_KEY: config.scoreApiKey } : {}),
         ...(config.scalaApiUrl ? { SCALA_API_URL: config.scalaApiUrl } : {})
       }
     })
@@ -47,19 +51,13 @@ build:
 capabilities:
   # Score (Company Intelligence)
   - search_companies:
-      description: "Search 250M+ companies by name, VAT number, or keyword"
+      description: "Search companies by name or tax/VAT id (identification data worldwide; financials only FR NO LT EE LV CO, 1 credit)"
       alwaysAllow: true
   - lookup_company:
-      description: "Get full company profile by ID or VAT number"
-      alwaysAllow: true
-  - company_report:
-      description: "Generate financial health reports (5-20 credits)"
-      alwaysAllow: false
-  - database_stats:
-      description: "Database statistics"
+      description: "Full company profile by id from search (1 credit); revenue_type reported|estimated; keep data_licences attribution"
       alwaysAllow: true
   - list_countries:
-      description: "List countries with company counts"
+      description: "List countries available in the Score database"
       alwaysAllow: true
   - check_credits:
       description: "Check API credits and plan"
@@ -159,13 +157,13 @@ documentation:
 
     1. Get a free API key at https://app.get-scala.com
     2. Install: `npx -y scala-mcp-server`
-    3. Set SCALA_API_KEY environment variable
+    3. Set SCALA_API_KEY (CRM etc.) and SCORE_API_KEY (company data: free key at https://score.get-scala.com/builders)
 
     ## What You Can Do
 
-    **Company Intelligence** (250M+ companies, 50+ countries)
+    **Company Intelligence** (identification data for 249M company records; revenue/employees/net income only where the data licence is confirmed: FR, NO, LT, EE, LV, CO; elsewhere `financials_withheld`; keep `data_licences` attribution)
     > "Find the top restaurant chains in Germany"
-    > "Look up Tesla's financial health"
+    > "Look up a French company's filed accounts"
 
     **CRM & Sales**
     > "Show my sales pipeline"

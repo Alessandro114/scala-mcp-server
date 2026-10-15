@@ -57,7 +57,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     // Route to the correct handler based on tool prefix
-    if (name.startsWith("score_") || ["search_companies", "lookup_company", "company_report", "database_stats", "list_countries", "check_credits"].includes(name)) {
+    if (name.startsWith("score_") || ["search_companies", "lookup_company", "list_countries", "check_credits"].includes(name)) {
       return handleScoreTool(name, args as Record<string, unknown>);
     }
     if (name.startsWith("crm_")) return handleCrmTool(name, args as Record<string, unknown>);

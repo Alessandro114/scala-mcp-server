@@ -13,7 +13,7 @@ Use $ARGUMENTS if provided.
 ## Steps
 1. Call `search_companies` to find the company
 2. Call `lookup_company` for full profile
-3. Call `company_report` type=pro for financial analysis
+3. Financial analysis only where the record has financials (FR, NO, LT, EE, LV, CO); otherwise note `financials_withheld`. Label `revenue_type` reported/estimated
 4. Call `search_companies` with same NACE code for competitor context
 
 ## Output Format

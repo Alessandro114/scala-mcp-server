@@ -52,7 +52,7 @@ Key positioning rules:
 - Price anchor: from EUR 2,000/month + setup fee for enterprise
 - Never mention build time or assembly — emphasize months of R&D and platform maturity
 - Include 20 industry-specific vertical modules
-- Highlight: 250M+ company intelligence database included
+- Highlight: company intelligence database included (financials only FR, NO, LT, EE, LV, CO)
 
 Structure: Hook → Pain amplification → SCALA solution → TCO comparison → CTA`,
             },
@@ -72,7 +72,7 @@ Structure: Hook → Pain amplification → SCALA solution → TCO comparison →
 Use the available SCALA tools to:
 1. Search for the company using search_companies
 2. Look up detailed profile using lookup_company
-3. Generate a company_report if the company is found
+3. Note: financials (revenue, employees, net income) exist only for FR, NO, LT, EE, LV, CO; if the record has financials_withheld="licence_not_confirmed", say so instead of estimating. Report revenue_type (reported vs estimated) and keep data_licences attribution.
 
 Then provide:
 - Financial health assessment (revenue trends, profitability, liquidity)

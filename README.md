@@ -5,7 +5,7 @@
 <h1 align="center">S.C.A.L.A. MCP Server</h1>
 
 <p align="center">
-  <strong>Run your entire business from Claude. 33 tools. 20 industries. 250M+ companies.</strong>
+  <strong>Run your entire business from Claude. 31 tools. 20 industries. 249M company records.</strong>
 </p>
 
 <p align="center">
@@ -19,7 +19,7 @@
 
 ---
 
-An [MCP server](https://modelcontextprotocol.io) that turns Claude into a full business operating system. Manage your CRM, send invoices, book appointments, chat with your AI assistant, run workflows, and search 250M+ companies — all without leaving your AI conversation.
+An [MCP server](https://modelcontextprotocol.io) that turns Claude into a full business operating system. Manage your CRM, send invoices, book appointments, chat with your AI assistant, run workflows, and look up company records worldwide — all without leaving your AI conversation.
 
 ## Quick Start
 
@@ -71,11 +71,11 @@ SCALA_API_KEY=your-key npx -y scala-mcp-server
 > "What are this month's real estate commissions?"
 > "Show studio project milestones"
 
-### Company Intelligence (250M+ companies)
+### Company Intelligence (249M company records)
 > "Find the top 10 SaaS companies in Germany"
-> "Look up Ferrero's financial health"
+> "Look up a French company by its SIREN/VAT id"
 > "Compare construction companies in Milan vs Munich"
-> "Generate a due diligence report on company XYZ"
+> "Find the company with tax id IT00159560366"
 
 ### Workflow Automation
 > "List all active workflows"
@@ -146,17 +146,19 @@ SCALA_API_KEY=your-key npx -y scala-mcp-server
 
 ---
 
-## Tools (33)
+## Tools (31)
 
 ### Company Intelligence
 | Tool | Description | Credits |
 |------|-------------|---------|
-| `search_companies` | Search 250M+ companies by name, VAT, keyword | 1 |
-| `lookup_company` | Full company profile by ID or VAT | 1 |
-| `company_report` | Health report (basic/pro/enterprise) | 5-20 |
-| `database_stats` | Database statistics | 0 |
-| `list_countries` | Countries with company counts | 0 |
-| `check_credits` | API credits and plan info | 0 |
+| `search_companies` | Search by name prefix or tax/VAT id (+ country filter) | 1 |
+| `lookup_company` | Full company profile by id from search | 1 |
+| `list_countries` | Countries available in the Score database | 0 (to be confirmed) |
+| `check_credits` | Remaining credits for the Score key | 0 |
+
+> **Data coverage and licences.** Identification data (name, tax id, address, status, sector) is returned for all countries. **Financials (revenue, employees, net income) are returned only for FR, NO, LT, EE, LV, CO**, where the data licence is confirmed (~766k filed accounts, measured 14/10/2026). For every other country the record has `financials_withheld: "licence_not_confirmed"` — no revenue is provided. Where financials exist, `revenue_type` is `reported` (filed accounts) or `estimated` (model estimate). Keep the `data_licences` field of the output when you display or redistribute data (attribution required, e.g. CO is CC BY-SA 4.0).
+>
+> **Score credentials.** Company tools call `https://score.get-scala.com/api/v1` (override with `SCORE_API_URL`) with the `X-API-Key` header, using `SCORE_API_KEY` (falls back to `SCALA_API_KEY`). Free key (50 calls/month, no card): https://score.get-scala.com/builders
 
 ### CRM
 | Tool | Description |
@@ -270,10 +272,10 @@ Pre-built prompt templates for common workflows:
 ```
 Your AI  <-->  MCP Protocol  <-->  scala-mcp-server  <-->  S.C.A.L.A. API
                                         |
-                              33 tools + 3 resources + 3 prompts
+                              31 tools + 3 resources + 3 prompts
                                         |
                     CRM - Invoicing - Bookings - SARA AI - Finance
-                    Workflows - 20 Verticals - 250M+ Companies
+                    Workflows - 20 Verticals - 249M Company Records
 ```
 
 ## Ecosystem
@@ -293,7 +295,7 @@ The server includes 5 pre-built skills for Claude Code (in `skills/`):
 |-------|-------------|
 | `/scala:daily-briefing` | Morning briefing — alerts, invoices, pipeline, KPIs, AI suggestions |
 | `/scala:business-health` | Health score + cash flow + recommendations |
-| `/scala:competitor-intel` | Competitor research from 250M+ companies |
+| `/scala:competitor-intel` | Competitor research from the Score company database |
 | `/scala:prospect-research` | Pre-meeting company deep dive + talking points |
 | `/scala:invoice-chase` | Overdue invoices grouped 30/60/90+ days + send reminders |
 

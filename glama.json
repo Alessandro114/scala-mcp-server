@@ -2,7 +2,7 @@
   "$schema": "https://glama.ai/schemas/glama.json",
   "name": "scala-mcp-server",
   "display_name": "S.C.A.L.A. AI OS — Business Operating System for Claude",
-  "description": "Run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant (WhatsApp/email/voice), workflow automation, 20 industry verticals, and 250M+ company intelligence database. The enterprise AI operating system that replaces SAP, Salesforce, and ServiceNow — at a fraction of the cost.",
+  "description": "Run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant (WhatsApp/email/voice), workflow automation, 20 industry verticals, and company intelligence database (financials only FR NO LT EE LV CO). The enterprise AI operating system that replaces SAP, Salesforce, and ServiceNow — at a fraction of the cost.",
   "icon": "https://get-scala.com/scala-logo.svg",
   "author": {
     "name": "Alessandro Binda",
@@ -40,11 +40,9 @@
     "automation"
   ],
   "tools": [
-    { "name": "search_companies", "description": "Search 250M+ companies by name, VAT, keyword" },
-    { "name": "lookup_company", "description": "Get full company profile by ID or VAT" },
-    { "name": "company_report", "description": "Generate financial health report" },
-    { "name": "database_stats", "description": "Database statistics" },
-    { "name": "list_countries", "description": "List countries with company counts" },
+    { "name": "search_companies", "description": "Search companies by name or tax/VAT id; financials only FR NO LT EE LV CO" },
+    { "name": "lookup_company", "description": "Full company profile by id (revenue_type reported|estimated; keep data_licences attribution)" },
+    { "name": "list_countries", "description": "List countries available in the Score database" },
     { "name": "check_credits", "description": "Check API credits and plan" },
     { "name": "crm_list_contacts", "description": "List and search CRM contacts" },
     { "name": "crm_create_contact", "description": "Create a CRM contact" },
