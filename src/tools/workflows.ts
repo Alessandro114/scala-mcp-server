@@ -1,4 +1,4 @@
-import { apiRequest, ok } from "../api.js";
+import { apiRequest, ok, seg } from "../api.js";
 
 export const workflowTools = [
   {
@@ -37,7 +37,7 @@ export async function handleWorkflowTool(name: string, args: Record<string, unkn
     case "workflow_list":
       return ok(await apiRequest("/api/workflows/list"));
     case "workflow_run":
-      return ok(await apiRequest(`/api/workflows/${args.workflow_id}/run`, undefined, "POST", {
+      return ok(await apiRequest(`/api/workflows/${seg(args.workflow_id)}/run`, undefined, "POST", {
         input: args.input,
       }));
     case "workflow_stats":

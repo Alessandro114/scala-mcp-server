@@ -1,4 +1,4 @@
-import { apiRequest, ok } from "../api.js";
+import { apiRequest, ok, seg } from "../api.js";
 
 export const crmTools = [
   {
@@ -93,12 +93,12 @@ export async function handleCrmTool(name: string, args: Record<string, unknown>)
       return ok(await apiRequest("/api/crm/contacts", undefined, "POST", args));
     case "crm_update_contact": {
       const { id, ...updates } = args;
-      return ok(await apiRequest(`/api/crm/contacts/${id}`, undefined, "PATCH", updates));
+      return ok(await apiRequest(`/api/crm/contacts/${seg(id)}`, undefined, "PATCH", updates));
     }
     case "crm_pipeline":
       return ok(await apiRequest("/api/crm/pipeline"));
     case "crm_contact_timeline":
-      return ok(await apiRequest(`/api/crm/contacts/${args.contact_id}/timeline`));
+      return ok(await apiRequest(`/api/crm/contacts/${seg(args.contact_id)}/timeline`));
     default:
       return { content: [{ type: "text" as const, text: `Unknown CRM tool: ${name}` }], isError: true as const };
   }

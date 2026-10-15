@@ -1,4 +1,4 @@
-import { apiRequest, ok } from "../api.js";
+import { apiRequest, ok, seg } from "../api.js";
 
 export const verticalTools = [
   {
@@ -70,16 +70,16 @@ export async function handleVerticalTool(name: string, args: Record<string, unkn
   switch (name) {
     case "vertical_kpis": {
       const vertical = args.vertical as string;
-      return ok(await apiRequest(`/api/${vertical}/kpis`));
+      return ok(await apiRequest(`/api/${seg(vertical)}/kpis`));
     }
     case "vertical_list_data": {
       const params: Record<string, string> = {};
       if (args.limit) params.limit = String(args.limit);
       if (args.search) params.search = args.search as string;
-      return ok(await apiRequest(`/api/data/${args.table}`, params));
+      return ok(await apiRequest(`/api/data/${seg(args.table)}`, params));
     }
     case "vertical_create_record":
-      return ok(await apiRequest(`/api/data/${args.table}`, undefined, "POST", args.data));
+      return ok(await apiRequest(`/api/data/${seg(args.table)}`, undefined, "POST", args.data));
     case "vertical_access":
       return ok(await apiRequest("/api/verticals/access"));
     default:
