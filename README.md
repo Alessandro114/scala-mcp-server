@@ -72,9 +72,9 @@ SCALA_API_KEY=your-key npx -y scala-mcp-server
 > "Show studio project milestones"
 
 ### Company Intelligence (249M company records)
-> "Find the top 10 SaaS companies in Germany"
+> "Find the French company with SIREN 552032534"
 > "Look up a French company by its SIREN/VAT id"
-> "Compare construction companies in Milan vs Munich"
+> "Compare two Norwegian companies by name"
 > "Find the company with tax id IT00159560366"
 
 ### Workflow Automation
@@ -153,7 +153,7 @@ SCALA_API_KEY=your-key npx -y scala-mcp-server
 |------|-------------|---------|
 | `search_companies` | Search by name prefix or tax/VAT id (+ country filter) | 1 |
 | `lookup_company` | Full company profile by id from search | 1 |
-| `list_countries` | Countries available in the Score database | 0 (to be confirmed) |
+| `list_countries` | Countries available in the Score database | 0 (not verified) |
 | `check_credits` | Remaining credits for the Score key | 0 |
 
 > **Data coverage and licences.** Identification data (name, tax id, address, status, sector) is returned for all countries. **Financials (revenue, employees, net income) are returned only for FR, NO, LT, EE, LV, CO**, where the data licence is confirmed (~766k filed accounts, measured 14/10/2026). For every other country the record has `financials_withheld: "licence_not_confirmed"` — no revenue is provided. Where financials exist, `revenue_type` is `reported` (filed accounts) or `estimated` (model estimate). Keep the `data_licences` field of the output when you display or redistribute data (attribution required, e.g. CO is CC BY-SA 4.0).

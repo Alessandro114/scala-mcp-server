@@ -43,6 +43,7 @@ export async function apiRequest(
 
 /** GET against the Score API (/search, /company/{id}, /usage, /countries). Auth: X-API-Key. */
 export async function scoreRequest(endpoint: string, params?: Record<string, string>) {
+  if (!SCORE_API_KEY) throw new Error("SCORE_API_KEY not set. Get a free key at https://score.get-scala.com/builders");
   const url = new URL(`${SCORE_BASE_URL}${endpoint}`);
   for (const [k, v] of Object.entries(params ?? {})) {
     if (v !== undefined && v !== "") url.searchParams.set(k, v);

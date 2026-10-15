@@ -29,6 +29,9 @@ startCommand:
       scoreApiKey:
         type: string
         description: "Score API key for company data (free: https://score.get-scala.com/builders)"
+      scoreApiUrl:
+        type: string
+        description: "Score API base URL (optional, default https://score.get-scala.com/api/v1)"
       scalaApiUrl:
         type: string
         description: "API base URL (optional)"
@@ -41,6 +44,7 @@ startCommand:
       env: {
         SCALA_API_KEY: config.scalaApiKey,
         ...(config.scoreApiKey ? { SCORE_API_KEY: config.scoreApiKey } : {}),
+        ...(config.scoreApiUrl ? { SCORE_API_URL: config.scoreApiUrl } : {}),
         ...(config.scalaApiUrl ? { SCALA_API_URL: config.scalaApiUrl } : {})
       }
     })
@@ -162,7 +166,7 @@ documentation:
     ## What You Can Do
 
     **Company Intelligence** (identification data for 249M company records; revenue/employees/net income only where the data licence is confirmed: FR, NO, LT, EE, LV, CO; elsewhere `financials_withheld`; keep `data_licences` attribution)
-    > "Find the top restaurant chains in Germany"
+    > "Find the Norwegian company named Equinor"
     > "Look up a French company's filed accounts"
 
     **CRM & Sales**

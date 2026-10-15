@@ -75,11 +75,10 @@ Use the available SCALA tools to:
 3. Note: financials (revenue, employees, net income) exist only for FR, NO, LT, EE, LV, CO; if the record has financials_withheld="licence_not_confirmed", say so instead of estimating. Report revenue_type (reported vs estimated) and keep data_licences attribution.
 
 Then provide:
-- Financial health assessment (revenue trends, profitability, liquidity)
-- Competitive positioning in their NACE sector
+- Company snapshot from the record; financial assessment ONLY if the record has financials (FR, NO, LT, EE, LV, CO), otherwise state they are withheld
+- Sector context from the record (no sector-wide averages available)
 - Risk factors and red flags
 - Growth opportunities
-- Comparison to sector averages
 
 Format as a professional business intelligence report.`,
             },
