@@ -60,8 +60,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 // Gli strumenti dello Score non hanno prefisso per ragioni storiche: sono i
 // primi che sono esistiti e i loro nomi sono gia pubblicati.
 const STRUMENTI_SCORE = [
-  "search_companies", "lookup_company", "company_report",
-  "database_stats", "list_countries", "check_credits",
+  "search_companies", "lookup_company", "list_countries", "check_credits",
 ];
 
 /**

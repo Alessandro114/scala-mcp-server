@@ -42,6 +42,26 @@ export async function apiRequest(
   return resp.json();
 }
 
+// S.C.A.L.A. Score (company data) is a separate service with its own key and base URL.
+const scoreKey = () => process.env.SCORE_API_KEY || apiKey();
+const scoreBaseUrl = () => (process.env.SCORE_API_URL || "https://score.get-scala.com/api/v1").replace(/\/$/, "");
+
+/** GET against the Score API (/search, /company/{id}, /usage, /countries). Auth: X-API-Key. */
+export async function scoreRequest(endpoint: string, params?: Record<string, string>) {
+  const key = scoreKey();
+  if (!key) throw new Error("SCORE_API_KEY not set. Get a free key at https://score.get-scala.com/builders");
+  const url = new URL(`${scoreBaseUrl()}${endpoint}`);
+  for (const [k, v] of Object.entries(params ?? {})) {
+    if (v !== undefined && v !== "") url.searchParams.set(k, v);
+  }
+  const resp = await fetch(url, { headers: { "X-API-Key": key } });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`Score API ${resp.status}: ${text.slice(0, 500)}`);
+  }
+  return resp.json();
+}
+
 export function ok(data: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] };
 }
