@@ -63,8 +63,11 @@ export async function handleScoreTool(name: string, args: Record<string, unknown
       if (args.country) params.country = String(args.country).toUpperCase();
       return ok(await scoreRequest("/search", params));
     }
-    case "lookup_company":
-      return ok(await scoreRequest(`/company/${encodeURIComponent(String(args.company_id ?? ""))}`));
+    case "lookup_company": {
+      const id = String(args.company_id ?? "").trim();
+      if (!id) return bad("company_id is required (use the id returned by search_companies).");
+      return ok(await scoreRequest(`/company/${encodeURIComponent(id)}`));
+    }
     case "list_countries":
       return ok(await scoreRequest("/countries"));
     case "check_credits":

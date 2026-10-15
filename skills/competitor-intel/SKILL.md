@@ -1,27 +1,22 @@
 ---
-description: Research competitors using SCALA's company database (financials only for FR, NO, LT, EE, LV, CO) — search by name or tax id, compare available financials, and generate competitive positioning analysis.
+description: Research named competitors using the SCALA Score company database (financials only for FR, NO, LT, EE, LV, CO) — compare identification data and available financials.
 ---
 
 # Competitive Intelligence Report
 
-Research competitors using SCALA Score data.
-
 ## Input
-The user provides: company name or industry, country (default IT), number of competitors (default 5).
+The user provides: competitor names or tax ids, country, number of competitors (default 5).
 Use $ARGUMENTS if provided.
 
 ## Steps
-1. Call `search_companies` with the company name (or tax_id) and country
-2. Call `lookup_company` for each top result
-3. Financials exist only for FR, NO, LT, EE, LV, CO (`financials_withheld` elsewhere); label `revenue_type` reported/estimated
+1. Call `search_companies` per competitor (name or tax_id, + country)
+2. Call `lookup_company` for each result
 
 ## Output Format
-Comparison table:
-| Company | Revenue | Employees | Health | Key Strength |
+| Company | Country | Status | Sector | Revenue (only if available) | revenue_type |
 
-Then:
-- Market position analysis
-- Gaps and opportunities
-- Recommended actions
+Then: gaps and opportunities, recommended actions.
+
+Data notes: search is by company name prefix or tax_id (+ country); there is no sector/NACE filter. Revenue, employees and net income exist only for FR, NO, LT, EE, LV, CO; elsewhere the record has financials_withheld='licence_not_confirmed' — say so, never estimate. Label revenue_type (reported = filed accounts, estimated = model). Keep data_licences attribution.
 
 Use real data only. Never fabricate company information.

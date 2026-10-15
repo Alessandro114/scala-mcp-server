@@ -1,5 +1,5 @@
 ---
-description: Deep-dive research on a potential client or partner before a meeting — company profile, financial health, competitors, talking points, and objection handlers.
+description: Deep-dive research on a potential client or partner before a meeting — company profile, financials where licensed, talking points, and objection handlers.
 ---
 
 # Prospect Research
@@ -12,15 +12,13 @@ Use $ARGUMENTS if provided.
 
 ## Steps
 1. Call `search_companies` to find the company
-2. Call `lookup_company` for full profile
-3. Financial analysis only where the record has financials (FR, NO, LT, EE, LV, CO); otherwise note `financials_withheld`. Label `revenue_type` reported/estimated
-4. Call `search_companies` with same NACE code for competitor context
+2. Call `lookup_company` for the full profile
+3. Data notes: search is by company name prefix or tax_id (+ country); there is no sector/NACE filter. Revenue, employees and net income exist only for FR, NO, LT, EE, LV, CO; elsewhere the record has financials_withheld='licence_not_confirmed' — say so, never estimate. Label revenue_type (reported = filed accounts, estimated = model). Keep data_licences attribution.
 
 ## Output Format
 One-page briefing:
-- Company snapshot (revenue, employees, health, founded)
+- Company snapshot (identification data; revenue/employees only if available)
 - Financial trajectory (growing/stable/declining)
-- Industry position vs top 5 competitors
 - 3 talking points tailored to their situation
 - 2 potential objections and handlers
 - Recommended next step
