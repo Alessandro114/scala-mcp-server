@@ -13,7 +13,7 @@ export const scoreTools = [
   {
     name: "search_companies",
     description:
-      "Search companies worldwide (identification data for all countries) by name prefix or by tax/VAT id. " +
+      "Search companies by name prefix or tax/VAT id. Coverage and licence status differ per country: see data_licences in the output (some countries are marked to_verify). " +
       "Optional ISO 2-letter country filter. 1 credit per call. " + LICENCE_NOTE,
     inputSchema: {
       type: "object" as const,
