@@ -1,5 +1,7 @@
 import { scoreRequest, ok } from "../api.js";
 
+const FINANCIALS_LICENSED = new Set(["FR", "NO", "LT", "EE", "LV", "CO"]);
+
 const LICENCE_NOTE =
   "Financial fields (revenue, employees, net income) are returned only for FR, NO, LT, EE, LV, CO, " +
   "where the data licence is confirmed; for all other countries the record carries " +
@@ -38,7 +40,7 @@ export const scoreTools = [
   },
   {
     name: "list_countries",
-    description: "List the countries available in the Score database. Keep data_licences attribution if present.",
+    description: "List the countries available in the Score database (company counts; financial-field counts only for FR, NO, LT, EE, LV, CO).",
     inputSchema: { type: "object" as const, properties: {} },
   },
   {
@@ -68,8 +70,18 @@ export async function handleScoreTool(name: string, args: Record<string, unknown
       if (!id) return bad("company_id is required (use the id returned by search_companies).");
       return ok(await scoreRequest(`/company/${encodeURIComponent(id)}`));
     }
-    case "list_countries":
-      return ok(await scoreRequest("/countries"));
+    case "list_countries": {
+      // Row counts of financial fields are hidden for countries without a confirmed data licence.
+      const data = (await scoreRequest("/countries")) as { countries?: Record<string, unknown>[] };
+      if (Array.isArray(data.countries)) {
+        data.countries = data.countries.map((c) =>
+          FINANCIALS_LICENSED.has(String(c.country))
+            ? c
+            : Object.fromEntries(Object.entries(c).filter(([k]) => k !== "with_revenue" && k !== "with_emp"))
+        );
+      }
+      return ok(data);
+    }
     case "check_credits":
       return ok(await scoreRequest("/usage"));
     default:

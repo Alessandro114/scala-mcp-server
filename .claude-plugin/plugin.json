@@ -1,7 +1,7 @@
 {
   "name": "scala",
   "description": "S.C.A.L.A. AI OS — Run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant, 20 industry verticals, company database (financials only FR NO LT EE LV CO).",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "Alessandro Binda",
     "email": "ale@get-scala.com"

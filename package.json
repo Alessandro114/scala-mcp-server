@@ -1,6 +1,6 @@
 {
   "name": "scala-mcp-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "mcpName": "io.github.Alessandro114/scala-ai-os",
   "description": "MCP server for S.C.A.L.A. AI OS — run your entire business from Claude. CRM, invoicing, bookings, AI assistant, 20 industry verticals, company database (249M records; financials only FR NO LT EE LV CO).",
   "type": "module",
