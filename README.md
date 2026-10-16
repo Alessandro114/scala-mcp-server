@@ -153,12 +153,12 @@ SCALA_API_KEY=your-key npx -y scala-mcp-server
 ### Company Intelligence
 | Tool | Description | Credits |
 |------|-------------|---------|
-| `search_companies` | Search by name prefix or tax/VAT id (+ country filter) | 1 |
+| `search_companies` | Search by name prefix or tax/VAT id (+ country filter); coverage varies by country | 1 |
 | `lookup_company` | Full company profile by id from search | 1 |
 | `list_countries` | Countries available in the Score database | 0 (not verified) |
 | `check_credits` | Remaining credits for the Score key | 0 |
 
-> **Data coverage and licences.** Identification data (name, tax id, address, status, sector) is returned for all countries. **Financials (revenue, employees, net income) are returned only for FR, NO, LT, EE, LV, CO**, where the data licence is confirmed (~766k filed accounts, measured 14/10/2026). For every other country the record has `financials_withheld: "licence_not_confirmed"` — no revenue is provided. Where financials exist, `revenue_type` is `reported` (filed accounts) or `estimated` (model estimate). Keep the `data_licences` field of the output when you display or redistribute data (attribution required, e.g. CO is CC BY-SA 4.0).
+> **Data coverage and licences.** Identification data (name, tax id, address, status, sector) is returned where available; licence status differs per country and is reported in `data_licences` (some countries are marked `to_verify` — check before redistributing). **Financials (revenue, employees, net income) are returned only for FR, NO, LT, EE, LV, CO**, where the data licence is confirmed (~766k filed accounts, measured 14/10/2026). For every other country the record has `financials_withheld: "licence_not_confirmed"` — no revenue is provided. Where financials exist, `revenue_type` is `reported` (filed accounts) or `estimated` (model estimate). Keep the `data_licences` field of the output when you display or redistribute data (attribution required, e.g. CO is CC BY-SA 4.0).
 >
 > **Score credentials.** Company tools call `https://score.get-scala.com/api/v1` (override with `SCORE_API_URL`) with the `X-API-Key` header, using `SCORE_API_KEY` (falls back to `SCALA_API_KEY`). Free key (50 calls/month, no card): https://score.get-scala.com/builders
 
