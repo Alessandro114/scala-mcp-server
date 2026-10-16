@@ -30,7 +30,7 @@ export { apiRequest };
 export { server };
 
 const server = new Server(
-  { name: "scala-ai-os", version: "1.0.0" },
+  { name: "scala-ai-os", version: "1.1.0" },
   {
     capabilities: {
       tools: {},

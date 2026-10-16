@@ -8,7 +8,7 @@ description: >-
   email, voice), workflow automation, and 20 industry-specific vertical modules
   (restaurants, real estate, agencies, car dealerships, and more). Includes
   company intelligence database (financials only FR NO LT EE LV CO) for search, enrichment, and due diligence.
-version: 1.0.0
+version: 1.1.0
 author: "Alessandro Binda <ale@get-scala.com>"
 license: MIT
 repository: https://github.com/Alessandro114/scala-mcp-server
