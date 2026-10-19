@@ -15,10 +15,11 @@ Streamable HTTP, stateless, **sola lettura (v1)**. Codice: `src/remote.ts`. Il s
    non e' condiviso da tutti gli utenti): autenticazione, rate limit, scope e RLS sono
    quelli del backend. **Nessuna credenziale viene letta dall'ambiente in modalita' remota.**
 
-## Tool esposti in v1 (16, tutti `readOnlyHint`)
-crm_list_contacts, crm_pipeline, crm_contact_timeline, invoice_list, finance_summary,
+## Tool esposti in v1 (14, tutti `readOnlyHint`)
+crm_list_contacts, crm_pipeline, crm_contact_timeline, finance_summary,
 finance_health_score, finance_cash_flow, sara_conversations, sara_insights, sara_alerts,
-sara_proactive, vertical_kpis, vertical_access, workflow_list, workflow_stats, booking_get_slots.
+sara_proactive, vertical_kpis, vertical_access, workflow_list, workflow_stats.
+Esclusi anche invoice_list (serve Fatture in Cloud collegato) e booking_get_slots (serve una pagina di prenotazione).
 Non esposti: tutte le scritture; i 4 tool Score (richiedono l'integrazione dei crediti per-utente nel
 backend); vertical_list_data (tabella libera); invoice_get_pdf (risposta binaria).
 

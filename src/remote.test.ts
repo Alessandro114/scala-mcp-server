@@ -70,7 +70,7 @@ test("protected resource metadata: resource = URL MCP esatto, issuer = authoriza
   }
 });
 
-test("initialize + tools/list: solo le 16 letture, tutte con title e readOnlyHint", async () => {
+test("initialize + tools/list: solo le 14 letture, tutte con title e readOnlyHint", async () => {
   const init = await rpc(TOK_A, "initialize", { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "t", version: "1" } });
   assert.equal(init.status, 200);
   const caps = ((await init.json()) as { result: { capabilities: Record<string, unknown> } }).result.capabilities;
@@ -79,7 +79,7 @@ test("initialize + tools/list: solo le 16 letture, tutte con title e readOnlyHin
   assert.equal(caps.prompts, undefined);
   const r = await rpc(TOK_A, "tools/list");
   const tools = ((await r.json()) as { result: { tools: { name: string; title: string; annotations: Record<string, unknown> }[] } }).result.tools;
-  assert.equal(tools.length, 16);
+  assert.equal(tools.length, 14);
   for (const t of tools) {
     assert.ok(t.title, t.name);
     assert.equal(t.annotations.readOnlyHint, true, t.name);
@@ -87,7 +87,7 @@ test("initialize + tools/list: solo le 16 letture, tutte con title e readOnlyHin
     assert.ok(t.name.length <= 64);
   }
   const nomi = new Set(tools.map((t) => t.name));
-  for (const vietato of ["crm_create_contact", "crm_update_contact", "booking_create", "booking_cancel", "invoice_create", "invoice_send", "sara_chat", "vertical_create_record", "workflow_run", "vertical_list_data", "invoice_get_pdf", "search_companies", "lookup_company", "list_countries", "check_credits"]) {
+  for (const vietato of ["crm_create_contact", "crm_update_contact", "booking_create", "booking_cancel", "invoice_create", "invoice_send", "sara_chat", "vertical_create_record", "workflow_run", "vertical_list_data", "invoice_get_pdf", "invoice_list", "booking_get_slots", "search_companies", "lookup_company", "list_countries", "check_credits"]) {
     assert.ok(!nomi.has(vietato), `${vietato} non deve essere esposto in remoto v1`);
   }
 });

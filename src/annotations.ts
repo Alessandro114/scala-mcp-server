@@ -4,13 +4,13 @@
 
 export const REMOTE_READ_TOOLS = new Set([
   "crm_list_contacts", "crm_pipeline", "crm_contact_timeline",
-  "invoice_list",
   "finance_summary", "finance_health_score", "finance_cash_flow",
   "sara_conversations", "sara_insights", "sara_alerts", "sara_proactive",
   "vertical_kpis", "vertical_access",
   "workflow_list", "workflow_stats",
-  "booking_get_slots",
 ]);
+// Esclusi dal remoto v1 perche' un account di prova non puo' farli riuscire senza configurazioni esterne:
+// invoice_list (richiede Fatture in Cloud collegato), booking_get_slots (richiede una pagina di prenotazione pubblica).
 
 /** Letture sul database Score (consumano crediti): sola lettura, ma non esposte in remoto v1. */
 const SCORE_READ_TOOLS = new Set(["search_companies", "lookup_company", "list_countries", "check_credits"]);
