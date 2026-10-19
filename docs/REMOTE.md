@@ -50,7 +50,7 @@ server {
     # tutto il resto: 404
 }
 ```
-Backend: `MCP_OAUTH_ISSUER=https://mcp.get-scala.com`, migrazione `408_mcp_oauth.sql`.
+Backend: `MCP_OAUTH_ISSUER=https://mcp.get-scala.com`, migrazione `409_mcp_oauth.sql`.
 
 ## Test
 `npm test` (node:test): server HTTP reale + backend finto. Copre 401/503, metadata, allowlist,
