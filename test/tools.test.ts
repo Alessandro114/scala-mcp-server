@@ -8,9 +8,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 const apiRequest = vi.fn(async () => ({ risposta: "ok" }));
+const scoreRequest = vi.fn(async () => ({ risposta: "ok" }));
 vi.mock("../src/api.js", async (originale) => ({
     ...(await originale<Record<string, unknown>>()),
     apiRequest: (...a: unknown[]) => apiRequest(...a as []),
+    scoreRequest: (...a: unknown[]) => scoreRequest(...a as []),
 }));
 
 const { handleScoreTool } = await import("../src/tools/score.js");
@@ -22,27 +24,12 @@ const { handleFinanceTool } = await import("../src/tools/finance.js");
 const { handleVerticalTool } = await import("../src/tools/verticals.js");
 const { handleWorkflowTool } = await import("../src/tools/workflows.js");
 
-beforeEach(() => apiRequest.mockClear());
+beforeEach(() => { apiRequest.mockClear(); scoreRequest.mockClear(); });
 
 /** [gestore, nome, argomenti, chiamata attesa a apiRequest] */
 type Caso = [Function, string, Record<string, unknown>, unknown[]];
 
 const CASI: Caso[] = [
-    // ── score ──
-    [handleScoreTool, "search_companies", { query: "Ferrero" },
-        ["/api/score/search", { q: "Ferrero", limit: "10" }]],
-    [handleScoreTool, "search_companies", { query: "x", country: "IT", nace: "56.10", status: "active", limit: 5 },
-        ["/api/score/search", { q: "x", limit: "5", country: "IT", nace: "56.10", status: "active" }]],
-    [handleScoreTool, "lookup_company", { company_id: "IT1" },
-        ["/api/score/lookup", { id: "IT1" }]],
-    [handleScoreTool, "company_report", { company_id: "c1" },
-        ["/api/score/report", undefined, "POST", { company_id: "c1", type: "basic" }]],
-    [handleScoreTool, "company_report", { company_id: "c1", type: "pro" },
-        ["/api/score/report", undefined, "POST", { company_id: "c1", type: "pro" }]],
-    [handleScoreTool, "database_stats", {}, ["/api/score/stats"]],
-    [handleScoreTool, "list_countries", {}, ["/api/score/countries"]],
-    [handleScoreTool, "check_credits", {}, ["/api/score/credits"]],
-
     // ── crm ──
     [handleCrmTool, "crm_list_contacts", {}, ["/api/crm/contacts", {}]],
     [handleCrmTool, "crm_list_contacts", { search: "rossi", stage: "lead", limit: 20 },
@@ -117,6 +104,64 @@ describe("ogni strumento chiama l endpoint giusto", () => {
         await (gestore as (n: string, a: Record<string, unknown>) => Promise<unknown>)(nome, args);
         expect(apiRequest).toHaveBeenCalledOnce();
         expect(apiRequest).toHaveBeenCalledWith(...(attesa as []));
+    });
+});
+
+// Lo Score e un servizio separato (score.get-scala.com/api/v1): ha il suo client.
+const CASI_SCORE: Caso[] = [
+    [handleScoreTool, "search_companies", { query: "Ferrero" },
+        ["/search", { limit: "10", q: "Ferrero" }]],
+    [handleScoreTool, "search_companies", { query: "x", country: "it", limit: 5 },
+        ["/search", { limit: "5", q: "x", country: "IT" }]],
+    [handleScoreTool, "search_companies", { tax_id: "123" },
+        ["/search", { limit: "10", tax_id: "123" }]],
+    [handleScoreTool, "lookup_company", { company_id: "IT1" }, ["/company/IT1"]],
+    [handleScoreTool, "list_countries", {}, ["/countries"]],
+    [handleScoreTool, "check_credits", {}, ["/usage"]],
+];
+
+describe("gli strumenti dello Score chiamano l API v1", () => {
+    it.each(CASI_SCORE)("%# %s", async (gestore, nome, args, attesa) => {
+        await (gestore as (n: string, a: Record<string, unknown>) => Promise<unknown>)(nome, args);
+        expect(scoreRequest).toHaveBeenCalledOnce();
+        expect(scoreRequest).toHaveBeenCalledWith(...(attesa as []));
+        expect(apiRequest).not.toHaveBeenCalled();
+    });
+
+    it("senza query ne tax_id risponde con un errore, senza chiamare l API", async () => {
+        const r = await handleScoreTool("search_companies", {}) as { isError?: boolean };
+        expect(r.isError).toBe(true);
+        expect(scoreRequest).not.toHaveBeenCalled();
+    });
+
+    it("argomenti non stringa vengono ignorati; limit non numerico torna a 10; limit e limitato a 100", async () => {
+        await handleScoreTool("search_companies", { query: 5, tax_id: "9", limit: "abc" });
+        expect(scoreRequest).toHaveBeenLastCalledWith("/search", { limit: "10", tax_id: "9" });
+        await handleScoreTool("search_companies", { query: "a", tax_id: 7, limit: 999 });
+        expect(scoreRequest).toHaveBeenLastCalledWith("/search", { limit: "100", q: "a" });
+    });
+
+    it("lookup_company senza id e strumento sconosciuto rispondono con errore", async () => {
+        expect(((await handleScoreTool("lookup_company", {})) as { isError?: boolean }).isError).toBe(true);
+        expect(((await handleScoreTool("boh", {})) as { isError?: boolean }).isError).toBe(true);
+        expect(scoreRequest).not.toHaveBeenCalled();
+    });
+
+    it("list_countries senza elenco restituisce la risposta cosi com e", async () => {
+        scoreRequest.mockResolvedValueOnce({ error: "x" } as never);
+        const r = await handleScoreTool("list_countries", {}) as { content: Array<{ text: string }> };
+        expect(JSON.parse(r.content[0].text)).toEqual({ error: "x" });
+    });
+
+    it("list_countries nasconde with_revenue/with_emp dove non c e licenza", async () => {
+        scoreRequest.mockResolvedValueOnce({ countries: [
+            { country: "IT", companies: 1, with_revenue: 9, with_emp: 9 },
+            { country: "FR", companies: 1, with_revenue: 9, with_emp: 9 },
+        ] } as never);
+        const r = await handleScoreTool("list_countries", {}) as { content: Array<{ text: string }> };
+        const { countries } = JSON.parse(r.content[0].text);
+        expect(countries[0]).toEqual({ country: "IT", companies: 1 });
+        expect(countries[1].with_revenue).toBe(9);
     });
 });
 

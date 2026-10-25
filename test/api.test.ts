@@ -148,3 +148,39 @@ describe("errori", () => {
         await expect(apiRequest("/x")).rejects.toThrow(/^API 500: x{500}$/);
     });
 });
+
+describe("scoreRequest (Score API v1)", () => {
+    beforeEach(() => { delete process.env.SCORE_API_KEY; delete process.env.SCORE_API_URL; });
+
+    it("chiama score.get-scala.com/api/v1 con X-API-Key e salta i parametri vuoti", async () => {
+        process.env.SCORE_API_KEY = "chiave-score";
+        rispondi({ ok: 1 });
+        const { scoreRequest } = await carica();
+        await scoreRequest("/search", { q: "Ferrero", country: "", limit: "5" });
+        expect(String(viste[0].url)).toBe("https://score.get-scala.com/api/v1/search?q=Ferrero&limit=5");
+        expect((viste[0].init.headers as Record<string, string>)["X-API-Key"]).toBe("chiave-score");
+    });
+
+    it("senza SCORE_API_KEY ripiega su SCALA_API_KEY; SCORE_API_URL ha la precedenza", async () => {
+        process.env.SCORE_API_URL = "https://score.test/api/v1/";
+        rispondi({});
+        const { scoreRequest } = await carica();
+        await scoreRequest("/usage");
+        expect(String(viste[0].url)).toBe("https://score.test/api/v1/usage");
+        expect((viste[0].init.headers as Record<string, string>)["X-API-Key"]).toBe("chiave-di-prova");
+    });
+
+    it("senza nessuna chiave non fa la chiamata", async () => {
+        delete process.env.SCALA_API_KEY;
+        rispondi({});
+        const { scoreRequest } = await carica();
+        await expect(scoreRequest("/usage")).rejects.toThrow("SCORE_API_KEY not set");
+        expect(viste).toHaveLength(0);
+    });
+
+    it("solleva riportando stato e corpo", async () => {
+        rispondi(null, { ok: false, status: 403, testo: "no licence" });
+        const { scoreRequest } = await carica();
+        await expect(scoreRequest("/countries")).rejects.toThrow("Score API 403: no licence");
+    });
+});
