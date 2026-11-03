@@ -3,7 +3,7 @@
 Research a potential client/partner before a meeting or outreach.
 
 ## What this skill does
-1. Looks up the company in SCALA's 250M+ database
+1. Looks up the company in SCALA's 249M+ database
 2. Analyzes financial health and trajectory
 3. Identifies industry competitors for context
 4. Generates talking points and objection handlers

@@ -2,7 +2,7 @@
   "$schema": "https://glama.ai/schemas/glama.json",
   "name": "scala-mcp-server",
   "display_name": "S.C.A.L.A. AI OS — Business Operating System for Claude",
-  "description": "Run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant (WhatsApp/email/voice), workflow automation, 20 industry verticals, and 250M+ company intelligence database. The enterprise AI operating system that replaces SAP, Salesforce, and ServiceNow — at a fraction of the cost.",
+  "description": "Run your entire business from Claude. CRM, invoicing, bookings, SARA AI assistant (WhatsApp/email/voice), workflow automation, 20 industry verticals, and 249M+ company intelligence database. The enterprise AI operating system that replaces SAP, Salesforce, and ServiceNow — at a fraction of the cost.",
   "icon": "https://get-scala.com/scala-logo.svg",
   "author": {
     "name": "Alessandro Binda",
@@ -40,7 +40,7 @@
     "automation"
   ],
   "tools": [
-    { "name": "search_companies", "description": "Search 250M+ companies by name, VAT, keyword" },
+    { "name": "search_companies", "description": "Search 249M+ companies by name, VAT, keyword" },
     { "name": "lookup_company", "description": "Get full company profile by ID or VAT" },
     { "name": "company_report", "description": "Generate financial health report" },
     { "name": "database_stats", "description": "Database statistics" },

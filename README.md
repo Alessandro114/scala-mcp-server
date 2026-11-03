@@ -5,7 +5,7 @@
 <h1 align="center">S.C.A.L.A. MCP Server</h1>
 
 <p align="center">
-  <strong>Run your entire business from Claude. 33 tools. 20 industries. 250M+ companies.</strong>
+  <strong>Run your entire business from Claude. 33 tools. 20 industries. 249M+ companies.</strong>
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
 
 ---
 
-An [MCP server](https://modelcontextprotocol.io) that turns Claude into a full business operating system. Manage your CRM, send invoices, book appointments, chat with your AI assistant, run workflows, and search 250M+ companies — all without leaving your AI conversation.
+An [MCP server](https://modelcontextprotocol.io) that turns Claude into a full business operating system. Manage your CRM, send invoices, book appointments, chat with your AI assistant, run workflows, and search 249M+ companies — all without leaving your AI conversation.
 
 ## Quick Start
 
@@ -73,7 +73,7 @@ SCALA_API_KEY=your-key npx -y scala-mcp-server
 > "What are this month's real estate commissions?"
 > "Show studio project milestones"
 
-### Company Intelligence (250M+ companies)
+### Company Intelligence (249M+ companies)
 > "Find the top 10 SaaS companies in Germany"
 > "Look up Ferrero's financial health"
 > "Compare construction companies in Milan vs Munich"
@@ -153,7 +153,7 @@ SCALA_API_KEY=your-key npx -y scala-mcp-server
 ### Company Intelligence
 | Tool | Description | Credits |
 |------|-------------|---------|
-| `search_companies` | Search 250M+ companies by name, VAT, keyword | 1 |
+| `search_companies` | Search 249M+ companies by name, VAT, keyword | 1 |
 | `lookup_company` | Full company profile by ID or VAT | 1 |
 | `company_report` | Health report (basic/pro/enterprise) | 5-20 |
 | `database_stats` | Database statistics | 0 |
@@ -275,7 +275,7 @@ Your AI  <-->  MCP Protocol  <-->  scala-mcp-server  <-->  S.C.A.L.A. API
                               33 tools + 3 resources + 3 prompts
                                         |
                     CRM - Invoicing - Bookings - SARA AI - Finance
-                    Workflows - 20 Verticals - 250M+ Companies
+                    Workflows - 20 Verticals - 249M+ Companies
 ```
 
 ## Ecosystem
@@ -295,7 +295,7 @@ The server includes 5 pre-built skills for Claude Code (in `skills/`):
 |-------|-------------|
 | `/scala:daily-briefing` | Morning briefing — alerts, invoices, pipeline, KPIs, AI suggestions |
 | `/scala:business-health` | Health score + cash flow + recommendations |
-| `/scala:competitor-intel` | Competitor research from 250M+ companies |
+| `/scala:competitor-intel` | Competitor research from 249M+ companies |
 | `/scala:prospect-research` | Pre-meeting company deep dive + talking points |
 | `/scala:invoice-chase` | Overdue invoices grouped 30/60/90+ days + send reminders |
 
@@ -312,3 +312,7 @@ npm run build  # Compile TypeScript
 ## License
 
 [MIT](LICENSE) — Copyright (c) 2026 Alessandro Binda / S.C.A.L.A. AI OS
+
+## Data coverage
+
+S.C.A.L.A. Score holds about 249 million company records from public registries and open data in 264 countries (figure shown on [score.get-scala.com](https://score.get-scala.com), checked 03/11/2026). Financial fields such as revenue, employees or score are present only where the source publishes them, which is a minority of the records; always check each field before relying on it.
