@@ -1,6 +1,6 @@
 # /competitor-intel — Competitive Intelligence Report
 
-Research competitors using SCALA's 250M+ company database.
+Research competitors using SCALA's 249M+ company database.
 
 ## What this skill does
 1. Searches for companies in the same NACE sector and country

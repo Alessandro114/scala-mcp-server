@@ -1,5 +1,5 @@
 ---
-description: Research competitors using SCALA's 250M+ company database — search by industry, compare financials, and generate competitive positioning analysis.
+description: Research competitors using SCALA's 249M+ company database — search by industry, compare financials where available, and generate competitive positioning analysis.
 ---
 
 # Competitive Intelligence Report

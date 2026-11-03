@@ -7,7 +7,7 @@ description: >-
   operating system with CRM, invoicing, bookings, SARA AI assistant (WhatsApp,
   email, voice), workflow automation, and 20 industry-specific vertical modules
   (restaurants, real estate, agencies, car dealerships, and more). Includes
-  250M+ company intelligence database for search, enrichment, and due diligence.
+  249M+ company intelligence database for search, enrichment, and due diligence.
 version: 1.0.0
 author: "Alessandro Binda <ale@get-scala.com>"
 license: MIT
@@ -47,7 +47,7 @@ build:
 capabilities:
   # Score (Company Intelligence)
   - search_companies:
-      description: "Search 250M+ companies by name, VAT number, or keyword"
+      description: "Search 249M+ companies by name, VAT number, or keyword"
       alwaysAllow: true
   - lookup_company:
       description: "Get full company profile by ID or VAT number"
@@ -163,7 +163,7 @@ documentation:
 
     ## What You Can Do
 
-    **Company Intelligence** (250M+ companies, 50+ countries)
+    **Company Intelligence** (249M+ companies, 264 countries)
     > "Find the top restaurant chains in Germany"
     > "Look up Tesla's financial health"
 
