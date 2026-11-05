@@ -15,7 +15,7 @@
   <a href="https://www.npmjs.com/package/scala-mcp-server"><img src="https://img.shields.io/npm/v/scala-mcp-server" alt="npm version"></a>
   <a href="https://www.npmjs.com/package/scala-mcp-server"><img src="https://img.shields.io/npm/dm/scala-mcp-server" alt="npm downloads"></a>
   <a href="https://github.com/Alessandro114/scala-mcp-server/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Alessandro114/scala-mcp-server" alt="License"></a>
-  <a href="https://smithery.ai/server/Alessandro114/scala-mcp-server"><img src="https://smithery.ai/badge/Alessandro114/scala-mcp-server" alt="Smithery"></a>
+  <a href="https://lightnow.ai/servers/io.github.Alessandro114/scala-ai-os"><img src="https://lightnow.ai/badge/io.github.Alessandro114/scala-ai-os" alt="LightNow capabilities"></a>
   <a href="https://glama.ai/mcp/servers/Alessandro114/scala-mcp-server"><img src="https://glama.ai/mcp/servers/Alessandro114/scala-mcp-server/badges/score.svg" alt="Glama Score"></a>
 </p>
 
