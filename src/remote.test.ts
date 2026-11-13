@@ -88,7 +88,8 @@ test("initialize + tools/list: solo le 14 letture, tutte con title e readOnlyHin
     assert.ok(t.title, t.name);
     assert.equal(t.annotations.readOnlyHint, true, t.name);
     assert.equal(t.annotations.destructiveHint, undefined, t.name);
-    assert.ok(t.name.length <= 64);
+    assert.equal(t.annotations.openWorldHint, false, t.name);
+    assert.ok(t.name.length <= 63, t.name); // limite di Gemini CLI (63); Claude Directory 64
   }
   const nomi = new Set(tools.map((t) => t.name));
   for (const vietato of ["crm_create_contact", "crm_update_contact", "booking_create", "booking_cancel", "invoice_create", "invoice_send", "sara_chat", "vertical_create_record", "workflow_run", "vertical_list_data", "invoice_get_pdf", "invoice_list", "booking_get_slots", "search_companies", "lookup_company", "list_countries", "check_credits"]) {
