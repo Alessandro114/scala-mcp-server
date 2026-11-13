@@ -17,7 +17,7 @@ import { verticalTools, handleVerticalTool } from "./tools/verticals.js";
 import { workflowTools, handleWorkflowTool } from "./tools/workflows.js";
 import { resources, handleResource } from "./resources.js";
 import { prompts, handlePrompt } from "./prompts.js";
-import { REMOTE_READ_TOOLS, withAnnotations } from "./annotations.js";
+import { toolNamesForTier, withAnnotations, type Tier } from "./annotations.js";
 
 const allTools = withAnnotations([
   ...scoreTools,
@@ -30,9 +30,14 @@ const allTools = withAnnotations([
   ...workflowTools,
 ]);
 
-/** Elenco dei tool esposti: in remoto v1 SOLO le letture dell'allowlist. */
-export function toolsFor(remote: boolean) {
-  return remote ? allTools.filter((t) => REMOTE_READ_TOOLS.has(t.name)) : allTools;
+/**
+ * Elenco dei tool esposti. Remoto: SOLO le letture del livello dell'utente (oggi solo `full`), livello
+ * sconosciuto = nessun tool. Locale (stdio, chiave propria): tutti.
+ */
+export function toolsFor(remote: boolean, tier: string = "full") {
+  if (!remote) return allTools;
+  const elenco = toolNamesForTier(tier);
+  return allTools.filter((t) => elenco.has(t.name));
 }
 
 /**
@@ -40,14 +45,14 @@ export function toolsFor(remote: boolean) {
  * dell'allowlist, niente resources/prompts, e il chiamante deve avvolgere ogni richiesta
  * in `conCredenziale(token, ...)` (api.ts).
  */
-export function createServer(opts: { remote: boolean }): Server {
+export function createServer(opts: { remote: boolean; tier?: Tier | string }): Server {
   const remote = opts.remote;
   const server = new Server(
     { name: "scala-ai-os", version: "1.0.0" },
     { capabilities: remote ? { tools: {} } : { tools: {}, resources: {}, prompts: {} } }
   );
 
-  const tools = toolsFor(remote);
+  const tools = toolsFor(remote, opts.tier);
   const consentiti = new Set(tools.map((t) => t.name));
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }));

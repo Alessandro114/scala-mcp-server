@@ -7,6 +7,8 @@ import type { AddressInfo } from "node:net";
 
 const TOK_A = "tok_AAAAAAAAAAAAAAAAAAAAAAAA";
 const TOK_B = "tok_BBBBBBBBBBBBBBBBBBBBBBBB";
+const TOK_SCONOSCIUTO = "tok_UNKNOWNUNKNOWNUNKNOWN";
+const TOK_OLD = "tok_OLDOLDOLDOLDOLDOLDOLDOLD";
 const TOK_DOWN = "tok_DOWNDOWNDOWNDOWNDOWNDOWN";
 const seen: { key: string; url: string; method: string; ip: string }[] = [];
 let backend: http.Server;
@@ -20,7 +22,9 @@ before(async () => {
     const send = (s: number, b: unknown) => { res.writeHead(s, { "Content-Type": "application/json" }); res.end(JSON.stringify(b)); };
     if (req.url === "/api/mcp-oauth/whoami") {
       if (key === TOK_DOWN) return send(500, { error: "boom" });
-      return key === TOK_A || key === TOK_B ? send(200, { user: { id: key } }) : send(401, { error: "no" });
+      if (key === TOK_OLD) return send(200, { ok: true }); // backend vecchio: nessun livello
+      if (key === TOK_SCONOSCIUTO) return send(200, { ok: true, tier: "platino" });
+      return key === TOK_A || key === TOK_B ? send(200, { ok: true, tier: "full", user: { id: key } }) : send(401, { error: "no" });
     }
     if (key !== TOK_A && key !== TOK_B) return send(401, { error: "no" });
     setTimeout(() => send(200, { data: [{ whoami: key, url: req.url }] }), Math.random() * 20);
@@ -164,6 +168,21 @@ test("'.' e '..' come identificativo sono rifiutati (non si sposta la richiesta 
   assert.equal(seen.filter((s) => s.url.includes("timeline")).length, 0);
 });
 
+test("livello full: 14 tool; whoami senza livello (backend vecchio) o con livello sconosciuto = 503, nessun tool", async () => {
+  const r = await rpc(TOK_A, "tools/list");
+  assert.equal(((await r.json()) as { result: { tools: unknown[] } }).result.tools.length, 14);
+  assert.equal((await rpc(TOK_OLD, "tools/list")).status, 503);
+  assert.equal((await rpc(TOK_SCONOSCIUTO, "tools/list")).status, 503);
+});
+
+test("elenchi per livello: un tool in nessun elenco non compare, livello sconosciuto = nessun tool", async () => {
+  const { FULL_TIER_TOOLS } = await import("./annotations.js");
+  const { toolsFor } = await import("./server.js");
+  assert.equal(toolsFor(true, "full").length, 14);
+  for (const livello of ["sara", "boh", ""]) assert.equal(toolsFor(true, livello).length, 0, livello);
+  for (const t of toolsFor(true, "full")) assert.ok(FULL_TIER_TOOLS.has(t.name), `${t.name} esposto senza essere assegnato al livello`);
+});
+
 test("token inventato: un solo giro al backend (cache negativa), poi stop per IP dopo 5 tentativi; i token validi passano sempre", async () => {
   seen.length = 0;
   const falso = "tok_FALSOFALSOFALSOFALSOFALSO";
@@ -180,3 +199,4 @@ test("tool di Score non esposti e, anche se chiamati dal codice, rifiutano in mo
   const { scoreRequest } = await import("./api.js");
   await assert.rejects(() => scoreRequest("/search", { q: "x" }), /not available on the remote server/);
 });
+

@@ -2,13 +2,21 @@
 // Claude Directory e usate da Claude per i permessi automatici. Le letture girano
 // senza conferma, ogni tool che modifica dati chiede conferma a ogni chiamata.
 
-export const REMOTE_READ_TOOLS = new Set([
+/** Livello del connettore remoto, deciso dal backend al consenso (whoami). */
+export type Tier = "full";
+
+/** Livello `full` (piani Growth, Scale, Enterprise): le 14 letture della v1. */
+export const FULL_TIER_TOOLS = new Set([
   "crm_list_contacts", "crm_pipeline", "crm_contact_timeline",
   "finance_summary", "finance_health_score", "finance_cash_flow",
   "sara_conversations", "sara_insights", "sara_alerts", "sara_proactive",
   "vertical_kpis", "vertical_access",
   "workflow_list", "workflow_stats",
 ]);
+/** Elenco dei tool del livello; livello sconosciuto = nessun tool (fail-closed). */
+export function toolNamesForTier(tier: string): ReadonlySet<string> {
+  return tier === "full" ? FULL_TIER_TOOLS : new Set();
+}
 // Esclusi dal remoto v1 perche' un account di prova non puo' farli riuscire senza configurazioni esterne:
 // invoice_list (richiede Fatture in Cloud collegato), booking_get_slots (richiede una pagina di prenotazione pubblica).
 
@@ -34,7 +42,7 @@ const TITLES: Record<string, string> = {
 type Tool = { name: string; [k: string]: unknown };
 
 export function isReadOnly(name: string): boolean {
-  return REMOTE_READ_TOOLS.has(name) || SCORE_READ_TOOLS.has(name) || OTHER_READ_TOOLS.has(name);
+  return FULL_TIER_TOOLS.has(name) || SCORE_READ_TOOLS.has(name) || OTHER_READ_TOOLS.has(name);
 }
 
 /** Aggiunge title e hint a ogni tool. */

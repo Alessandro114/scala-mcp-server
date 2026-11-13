@@ -15,7 +15,21 @@ Streamable HTTP, stateless, **sola lettura (v1)**. Codice: `src/remote.ts`. Il s
    non e' condiviso da tutti gli utenti): autenticazione, rate limit, scope e RLS sono
    quelli del backend. **Nessuna credenziale viene letta dall'ambiente in modalita' remota.**
 
-## Tool esposti in v1 (14, tutti `readOnlyHint`)
+## Livelli (strumenti secondo il piano)
+Il livello lo decide il backend al consenso OAuth dal piano dell'utente (`plan_tier` + `subscription_status`) e
+lo scrive nella chiave emessa; `whoami` risponde `{ ok: true, tier }` e questo server espone solo i tool di quel livello.
+Verso Claude lo scope resta `mcp:read`. Un tool che non sta in nessun elenco (`src/annotations.ts`) non viene esposto;
+chiamare un tool fuori livello risponde `Unknown tool`. Il backend applica comunque lo stesso limite sui percorsi (403).
+
+| Livello | Piani | Tool |
+|---|---|---|
+| `full` | Growth, Scale, Enterprise (`MCP_OAUTH_MIN_PLAN`, default `growth`) | i 14 qui sotto |
+| nessuno | free, scaduti, annullati | consenso rifiutato |
+
+SOLO SARA e' respinto al consenso finche' non esiste il livello `sara`. Il livello si ricalcola a ogni refresh (token di accesso: 1 ora). Rilascio: backend per primo; un `whoami` senza livello
+(backend vecchio) fa rispondere 503 a questo server, mai un livello inventato.
+
+## Tool del livello `full` (14, tutti `readOnlyHint`)
 crm_list_contacts, crm_pipeline, crm_contact_timeline, finance_summary,
 finance_health_score, finance_cash_flow, sara_conversations, sara_insights, sara_alerts,
 sara_proactive, vertical_kpis, vertical_access, workflow_list, workflow_stats.
@@ -54,5 +68,5 @@ server {
 Backend: `MCP_OAUTH_ISSUER=https://mcp.get-scala.com`, migrazione `409_mcp_oauth.sql`.
 
 ## Test
-`npm test` (node:test): server HTTP reale + backend finto. Copre 401/503, metadata, allowlist,
+`npm test` (node:test): server HTTP reale + backend finto. Copre 401/503, metadata, allowlist, livello `full`,
 isolamento fra token in parallelo, assenza di credenziali d'ambiente, path traversal, Origin, limiti.

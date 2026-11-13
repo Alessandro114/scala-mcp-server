@@ -12,6 +12,7 @@
 
 import http from "node:http";
 import crypto from "node:crypto";
+import type { Tier } from "./annotations.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 
 if (process.env.MCP_REMOTE !== "1") {
@@ -21,6 +22,7 @@ if (process.env.MCP_REMOTE !== "1") {
 
 const { conCredenziale, identitaRateLimit } = await import("./api.js");
 const { createServer } = await import("./server.js");
+
 
 const PORT = parseInt(process.env.PORT || "3030", 10);
 const HOST = process.env.HOST || "127.0.0.1";
@@ -42,14 +44,16 @@ const sha = (s: string) => crypto.createHash("sha256").update(s).digest("hex");
 // ── validazione del token ────────────────────────────────────────────────────
 // Cache breve degli esiti positivi (20 s) e NEGATIVA (60 s): un token inventato non deve costare una
 // chiamata al backend a ogni richiesta. Richieste identiche in corso si fondono in una sola.
-const validi = new Map<string, number>();
+const validi = new Map<string, { scade: number; tier: Tier }>();
 const invalidi = new Map<string, number>();
 const inCorso = new Map<string, Promise<Esito>>();
 let validazioniAttive = 0;
 const MAX_VALIDAZIONI = parseInt(process.env.MCP_MAX_VALIDATIONS || "16", 10);
 const NEG_TTL_MS = 60_000;
 
-type Esito = "ok" | "invalid" | "unavailable";
+type Esito = { stato: "ok"; tier: Tier } | { stato: "invalid" | "unavailable" };
+const INVALID: Esito = { stato: "invalid" };
+const UNAVAILABLE: Esito = { stato: "unavailable" };
 
 async function chiediAlBackend(token: string): Promise<Esito> {
   try {
@@ -57,26 +61,30 @@ async function chiediAlBackend(token: string): Promise<Esito> {
       headers: { "X-API-Key": token, "cf-connecting-ip": identitaRateLimit(token) },
       signal: AbortSignal.timeout(8000),
     });
-    if (r.status === 401 || r.status === 403) return "invalid";
-    if (!r.ok) return "unavailable";
-    return "ok";
+    if (r.status === 401 || r.status === 403) return INVALID;
+    if (!r.ok) return UNAVAILABLE;
+    // Il livello lo decide il backend. Risposta senza livello riconosciuto (backend vecchio): niente tool,
+    // mai un livello inventato qui. Il rilascio e' backend per primo.
+    const j = (await r.json().catch(() => null)) as { tier?: unknown } | null;
+    return j?.tier === "full" ? { stato: "ok", tier: j.tier } : UNAVAILABLE;
   } catch {
-    return "unavailable";
+    return UNAVAILABLE;
   }
 }
 
 async function validaToken(token: string): Promise<Esito> {
   const h = sha(token);
   const ora = Date.now();
-  if ((validi.get(h) ?? 0) > ora) return "ok";
-  if ((invalidi.get(h) ?? 0) > ora) return "invalid";
+  const v = validi.get(h);
+  if (v && v.scade > ora) return { stato: "ok", tier: v.tier };
+  if ((invalidi.get(h) ?? 0) > ora) return INVALID;
   const gia = inCorso.get(h);
   if (gia) return gia;
-  if (validazioniAttive >= MAX_VALIDAZIONI) return "unavailable";
+  if (validazioniAttive >= MAX_VALIDAZIONI) return UNAVAILABLE;
   validazioniAttive += 1;
   const p = chiediAlBackend(token).then((e) => {
-    if (e === "ok") { if (validi.size > 5000) validi.clear(); validi.set(h, Date.now() + VALIDATION_TTL_MS); }
-    if (e === "invalid") { if (invalidi.size > 5000) invalidi.clear(); invalidi.set(h, Date.now() + NEG_TTL_MS); }
+    if (e.stato === "ok") { if (validi.size > 5000) validi.clear(); validi.set(h, { scade: Date.now() + VALIDATION_TTL_MS, tier: e.tier }); }
+    if (e.stato === "invalid") { if (invalidi.size > 5000) invalidi.clear(); invalidi.set(h, Date.now() + NEG_TTL_MS); }
     return e;
   }).finally(() => { validazioniAttive -= 1; inCorso.delete(h); });
   inCorso.set(h, p);
@@ -188,17 +196,17 @@ export const httpServer = http.createServer(async (req, res) => {
 
     const ip = ipClient(req);
     // Chi ha gia un token riconosciuto valido non viene mai fermato dal contatore dei tentativi falliti.
-    if (!((validi.get(h) ?? 0) > Date.now()) && troppiFalliti(ip)) return json(res, 429, { error: "rate_limited" }, { "Retry-After": "60" });
+    if (!((validi.get(h)?.scade ?? 0) > Date.now()) && troppiFalliti(ip)) return json(res, 429, { error: "rate_limited" }, { "Retry-After": "60" });
     const esito = await validaToken(token);
-    if (esito === "invalid") { segnalaFallito(ip); return non401(res); }
-    if (esito === "unavailable") return json(res, 503, { error: "backend_unavailable" }, { "Retry-After": "5" });
+    if (esito.stato === "invalid") { segnalaFallito(ip); return non401(res); }
+    if (esito.stato !== "ok") return json(res, 503, { error: "backend_unavailable" }, { "Retry-After": "5" });
     if (!entro(h)) return json(res, 429, { error: "rate_limited" }, { "Retry-After": "60" });
     if (inflight >= MAX_INFLIGHT) return json(res, 503, { error: "busy" }, { "Retry-After": "2" });
 
     const body = await leggiCorpo(req);
 
     inflight += 1;
-    const server = createServer({ remote: true });
+    const server = createServer({ remote: true, tier: esito.tier });
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
     res.on("close", () => { inflight -= 1; void transport.close(); void server.close(); });
     await server.connect(transport);
