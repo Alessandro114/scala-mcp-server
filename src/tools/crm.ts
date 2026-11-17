@@ -1,11 +1,13 @@
 import { apiRequest, ok, seg } from "../api.js";
+import { leggiPagina, paramsPagina, limitaElenco } from "../pagina.js";
 
 export const crmTools = [
   {
     name: "crm_list_contacts",
     description:
       "List CRM contacts with optional search. Returns name, email, phone, company, " +
-      "deal stage (lead/qualified/proposal/won/lost), score, and tags.",
+      "deal stage (lead/qualified/proposal/won/lost), score, and tags. " +
+      "Returns one page (default 20, max 50 contacts); use offset for the next page. The response includes page.has_more.",
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -15,7 +17,8 @@ export const crmTools = [
           enum: ["lead", "qualified", "proposal", "won", "lost"],
           description: "Filter by pipeline stage",
         },
-        limit: { type: "number", description: "Max results (default 20)" },
+        limit: { type: "number", description: "Max results per page (default 20, max 50)" },
+        offset: { type: "number", description: "Number of results to skip (default 0)" },
       },
     },
   },
@@ -64,8 +67,16 @@ export const crmTools = [
   },
   {
     name: "crm_pipeline",
-    description: "Get the CRM pipeline view — contacts grouped by stage with counts and deal values.",
-    inputSchema: { type: "object" as const, properties: {} },
+    description:
+      "Get the CRM pipeline view — contacts grouped by stage with counts and deal values. " +
+      "Returns one page (default 50, max 100 deals); use offset for the next page. The response includes page.has_more.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        limit: { type: "number", description: "Max deals per page (default 50, max 100)" },
+        offset: { type: "number", description: "Number of deals to skip (default 0)" },
+      },
+    },
   },
   {
     name: "crm_contact_timeline",
@@ -83,11 +94,11 @@ export const crmTools = [
 export async function handleCrmTool(name: string, args: Record<string, unknown>) {
   switch (name) {
     case "crm_list_contacts": {
-      const params: Record<string, string> = {};
+      const pagina = leggiPagina(args);
+      const params: Record<string, string> = { ...paramsPagina(pagina) };
       if (args.search) params.search = args.search as string;
       if (args.stage) params.stage = args.stage as string;
-      if (args.limit) params.limit = String(args.limit);
-      return ok(await apiRequest("/api/crm/contacts", params));
+      return ok(limitaElenco(await apiRequest("/api/crm/contacts", params), pagina, ["contacts"]));
     }
     case "crm_create_contact":
       return ok(await apiRequest("/api/crm/contacts", undefined, "POST", args));
@@ -96,7 +107,10 @@ export async function handleCrmTool(name: string, args: Record<string, unknown>)
       return ok(await apiRequest(`/api/crm/contacts/${seg(id)}`, undefined, "PATCH", updates));
     }
     case "crm_pipeline":
-      return ok(await apiRequest("/api/crm/pipeline"));
+    {
+      const pagina = leggiPagina(args, 50, 100);
+      return ok(limitaElenco(await apiRequest("/api/crm/pipeline", paramsPagina(pagina)), pagina, ["deals"]));
+    }
     case "crm_contact_timeline":
       return ok(await apiRequest(`/api/crm/contacts/${seg(args.contact_id)}/timeline`));
     default:

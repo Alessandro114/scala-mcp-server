@@ -98,12 +98,40 @@ export async function scoreRequest(endpoint: string, params?: Record<string, str
   return resp.json();
 }
 
-const MAX_REMOTE_CHARS = 100_000;
+// Tetto di dimensione della risposta nel remoto (Software Directory Policy 5.B: token proporzionati al compito).
+export const MAX_REMOTE_CHARS = parseInt(process.env.MCP_MAX_RESPONSE_CHARS || "40000", 10) || 40_000;
+
+/**
+ * Riduce l'elenco piu' lungo della risposta (dimezzandolo) finche' il testo sta nel tetto, e lo dichiara in `truncated`.
+ * Meglio un elenco corto e onesto che un JSON spezzato a meta'. Ritorna null se non c'e' un elenco da ridurre.
+ */
+export function restringi(data: unknown, max: number): unknown | null {
+  if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+  const obj = data as Record<string, unknown>;
+  let chiave: string | null = null;
+  for (const [k, v] of Object.entries(obj)) {
+    if (Array.isArray(v) && (chiave === null || v.length > (obj[chiave] as unknown[]).length)) chiave = k;
+  }
+  if (chiave === null) return null;
+  const tutto = obj[chiave] as unknown[];
+  let n = tutto.length;
+  while (n > 1) {
+    n = Math.max(1, Math.floor(n / 2));
+    const candidato = {
+      ...obj,
+      [chiave]: tutto.slice(0, n),
+      truncated: { message: `Response reduced to ${n} of ${tutto.length} items to stay under ${max} characters. Use a smaller limit, offset or filters.`, returned: n, total: tutto.length },
+    };
+    if ((JSON.stringify(candidato, null, 2) ?? "").length <= max) return candidato;
+  }
+  return null;
+}
 
 export function ok(data: unknown) {
   let text = JSON.stringify(data, null, 2) ?? "null";
   if (REMOTE && text.length > MAX_REMOTE_CHARS) {
-    text = text.slice(0, MAX_REMOTE_CHARS) + `\n...[truncated: response exceeded ${MAX_REMOTE_CHARS} characters; narrow the query]`;
+    const ridotto = restringi(data, MAX_REMOTE_CHARS);
+    text = ridotto ? JSON.stringify(ridotto, null, 2) : text.slice(0, MAX_REMOTE_CHARS) + `\n...[truncated: response exceeded ${MAX_REMOTE_CHARS} characters; narrow the query]`;
   }
   return { content: [{ type: "text" as const, text }] };
 }
