@@ -33,8 +33,8 @@ export const saraTools = [
   {
     name: "sara_insights",
     description:
-      "Get SARA's business insights — AI-generated analysis of trends, anomalies, " +
-      "and actionable recommendations based on your business data.",
+      "Get the business insights SARA has computed from your WhatsApp activity (for example busiest hours), " +
+      "each with its type, data, confidence and sample size. Can be empty when there is not enough data yet.",
     inputSchema: { type: "object" as const, properties: {} },
   },
   {

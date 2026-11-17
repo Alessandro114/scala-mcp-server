@@ -1,5 +1,5 @@
 import { apiRequest, ok, seg } from "../api.js";
-import { leggiPagina, paramsPagina, limitaElenco } from "../pagina.js";
+import { leggiPagina, paramsPagina, limitaElenco, accorciaCampi } from "../pagina.js";
 
 export const crmTools = [
   {
@@ -7,7 +7,8 @@ export const crmTools = [
     description:
       "List CRM contacts with optional search. Returns name, email, phone, company, " +
       "deal stage (lead/qualified/proposal/won/lost), score, and tags. " +
-      "Returns one page (default 20, max 50 contacts); use offset for the next page. The response includes page.has_more.",
+      "Returns one page (default 20, max 50 contacts); use offset for the next page. The response includes page.has_more. " +
+      "Long notes are cut to 200 characters and marked notes_truncated.",
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -68,8 +69,9 @@ export const crmTools = [
   {
     name: "crm_pipeline",
     description:
-      "Get the CRM pipeline view — contacts grouped by stage with counts and deal values. " +
-      "Returns one page (default 50, max 100 deals); use offset for the next page. The response includes page.has_more.",
+      "List the CRM pipeline deals as a flat list (not grouped): title, value, currency, stage, contact, probability, expected close. " +
+      "Returns one page (default 50, max 100 deals); use offset for the next page. The response includes page.has_more. " +
+      "Long notes are cut to 200 characters.",
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -80,7 +82,9 @@ export const crmTools = [
   },
   {
     name: "crm_contact_timeline",
-    description: "Get the full activity timeline for a contact: calls, emails, meetings, notes, deals.",
+    description:
+      "Get the activity timeline for one contact: logged activities (emails, calls, meetings, notes, tasks) " +
+      "and CRM actions, with total, limit and offset.",
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -98,7 +102,7 @@ export async function handleCrmTool(name: string, args: Record<string, unknown>)
       const params: Record<string, string> = { ...paramsPagina(pagina) };
       if (args.search) params.search = args.search as string;
       if (args.stage) params.stage = args.stage as string;
-      return ok(limitaElenco(await apiRequest("/api/crm/contacts", params), pagina, ["contacts"]));
+      return ok(accorciaCampi(limitaElenco(await apiRequest("/api/crm/contacts", params), pagina, ["contacts"]), "contacts", "notes", 200));
     }
     case "crm_create_contact":
       return ok(await apiRequest("/api/crm/contacts", undefined, "POST", args));
@@ -109,7 +113,7 @@ export async function handleCrmTool(name: string, args: Record<string, unknown>)
     case "crm_pipeline":
     {
       const pagina = leggiPagina(args, 50, 100);
-      return ok(limitaElenco(await apiRequest("/api/crm/pipeline", paramsPagina(pagina)), pagina, ["deals"]));
+      return ok(accorciaCampi(limitaElenco(await apiRequest("/api/crm/pipeline", paramsPagina(pagina)), pagina, ["deals"]), "deals", "notes", 200));
     }
     case "crm_contact_timeline":
       return ok(await apiRequest(`/api/crm/contacts/${seg(args.contact_id)}/timeline`));

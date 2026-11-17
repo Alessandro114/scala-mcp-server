@@ -54,3 +54,24 @@ export function limitaElenco(risposta: unknown, p: Pagina, chiavi: string[]): un
   }
   return r;
 }
+
+/**
+ * Accorcia a `max` caratteri il campo di testo `campo` di ogni elemento dell'elenco `chiave` e lo segnala con `<campo>_truncated: true`.
+ * Serve a non mandare all'assistente note lunghe (~2.000 caratteri a contatto) quando basta una lista.
+ */
+export function accorciaCampi(risposta: unknown, chiave: string, campo: string, max: number): unknown {
+  if (!risposta || typeof risposta !== "object" || Array.isArray(risposta)) return risposta;
+  const r = risposta as Record<string, unknown>;
+  const elenco = r[chiave];
+  if (!Array.isArray(elenco)) return risposta;
+  return {
+    ...r,
+    [chiave]: elenco.map((el) => {
+      if (!el || typeof el !== "object") return el;
+      const o = el as Record<string, unknown>;
+      const v = o[campo];
+      if (typeof v !== "string" || v.length <= max) return el;
+      return { ...o, [campo]: v.slice(0, max) + "…", [campo + "_truncated"]: true };
+    }),
+  };
+}

@@ -4,8 +4,8 @@ export const workflowTools = [
   {
     name: "workflow_list",
     description:
-      "List all automation workflows with their status (active/paused), " +
-      "trigger type, last run, and success rate.",
+      "List automation workflows with name, description, whether each is active, trigger type, steps, " +
+      "run count and last run time. Does not include a success rate.",
     inputSchema: { type: "object" as const, properties: {} },
   },
   {
@@ -27,7 +27,7 @@ export const workflowTools = [
   },
   {
     name: "workflow_stats",
-    description: "Get workflow statistics: total runs, success rate, avg duration, errors.",
+    description: "Get workflow statistics: total workflows, active workflows, total runs, failed runs and available templates.",
     inputSchema: { type: "object" as const, properties: {} },
   },
 ];
