@@ -87,7 +87,7 @@ test("initialize + tools/list: solo le 14 letture, tutte con title e readOnlyHin
   for (const t of tools) {
     assert.ok(t.title, t.name);
     assert.equal(t.annotations.readOnlyHint, true, t.name);
-    assert.equal(t.annotations.destructiveHint, undefined, t.name);
+    assert.equal(t.annotations.destructiveHint, false, t.name); // OpenAI vuole tutti e tre gli hint espliciti
     assert.equal(t.annotations.openWorldHint, false, t.name);
     assert.ok(t.name.length <= 63, t.name); // limite di Gemini CLI (63); Claude Directory 64
   }

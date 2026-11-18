@@ -54,7 +54,7 @@ export function withAnnotations<T extends Tool>(tools: T[]): (T & { title: strin
       ...t,
       title,
       annotations: readOnly
-        ? { title, readOnlyHint: true, openWorldHint: false }
+        ? { title, readOnlyHint: true, destructiveHint: false, openWorldHint: false }
         : { title, readOnlyHint: false, destructiveHint: true, openWorldHint: false },
     };
   });
