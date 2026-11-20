@@ -6,7 +6,7 @@ export const saraTools = [
     description:
       "Send a message to SARA, the AI business assistant. SARA can answer questions " +
       "about your business, customers, bookings, inventory, and more. " +
-      "She has context about your entire SCALA workspace.",
+      "She answers from the workspace data your account can access.",
     inputSchema: {
       type: "object" as const,
       properties: {
