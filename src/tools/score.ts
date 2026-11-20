@@ -4,7 +4,7 @@ export const scoreTools = [
   {
     name: "search_companies",
     description:
-      "Search 250M+ companies worldwide by name, VAT number, or keyword. " +
+      "Search 249M+ company records in 264 countries by name, VAT number, or keyword. " +
       "Filter by country (ISO 2-letter), NACE industry code, and status.",
     inputSchema: {
       type: "object" as const,
@@ -21,8 +21,9 @@ export const scoreTools = [
   {
     name: "lookup_company",
     description:
-      "Get detailed company profile by ID or VAT number. Returns revenue, employees, " +
-      "health score, NACE classification, legal form, incorporation date, contacts.",
+      "Get the company profile by ID or VAT number: the fields the source registry publishes " +
+      "(e.g. NACE classification, legal form, status, incorporation date). Financial fields " +
+      "such as revenue and employees are returned only where available; coverage varies by country.",
     inputSchema: {
       type: "object" as const,
       properties: {
