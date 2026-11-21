@@ -1,4 +1,4 @@
-import { apiRequest, ok } from "../api.js";
+import { apiRequest, ok, seg } from "../api.js";
 
 export const invoiceTools = [
   {
@@ -82,9 +82,9 @@ export async function handleInvoiceTool(name: string, args: Record<string, unkno
     case "invoice_create":
       return ok(await apiRequest("/api/invoicing/create", undefined, "POST", args));
     case "invoice_send":
-      return ok(await apiRequest(`/api/invoicing/${args.invoice_id}/send`, undefined, "POST"));
+      return ok(await apiRequest(`/api/invoicing/${seg(args.invoice_id)}/send`, undefined, "POST"));
     case "invoice_get_pdf":
-      return ok(await apiRequest(`/api/invoicing/${args.invoice_id}/pdf`));
+      return ok(await apiRequest(`/api/invoicing/${seg(args.invoice_id)}/pdf`));
     default:
       return { content: [{ type: "text" as const, text: `Unknown invoice tool: ${name}` }], isError: true as const };
   }

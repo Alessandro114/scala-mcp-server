@@ -8,9 +8,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 const apiRequest = vi.fn(async () => ({ risposta: "ok" }));
+const scoreRequest = vi.fn(async () => ({ risposta: "ok" }));
 vi.mock("../src/api.js", async (originale) => ({
     ...(await originale<Record<string, unknown>>()),
     apiRequest: (...a: unknown[]) => apiRequest(...a as []),
+    scoreRequest: (...a: unknown[]) => scoreRequest(...a as []),
 }));
 
 const { handleScoreTool } = await import("../src/tools/score.js");
@@ -22,37 +24,22 @@ const { handleFinanceTool } = await import("../src/tools/finance.js");
 const { handleVerticalTool } = await import("../src/tools/verticals.js");
 const { handleWorkflowTool } = await import("../src/tools/workflows.js");
 
-beforeEach(() => apiRequest.mockClear());
+beforeEach(() => { apiRequest.mockClear(); scoreRequest.mockClear(); });
 
 /** [gestore, nome, argomenti, chiamata attesa a apiRequest] */
 type Caso = [Function, string, Record<string, unknown>, unknown[]];
 
 const CASI: Caso[] = [
-    // ── score ──
-    [handleScoreTool, "search_companies", { query: "Ferrero" },
-        ["/api/score/search", { q: "Ferrero", limit: "10" }]],
-    [handleScoreTool, "search_companies", { query: "x", country: "IT", nace: "56.10", status: "active", limit: 5 },
-        ["/api/score/search", { q: "x", limit: "5", country: "IT", nace: "56.10", status: "active" }]],
-    [handleScoreTool, "lookup_company", { company_id: "IT1" },
-        ["/api/score/lookup", { id: "IT1" }]],
-    [handleScoreTool, "company_report", { company_id: "c1" },
-        ["/api/score/report", undefined, "POST", { company_id: "c1", type: "basic" }]],
-    [handleScoreTool, "company_report", { company_id: "c1", type: "pro" },
-        ["/api/score/report", undefined, "POST", { company_id: "c1", type: "pro" }]],
-    [handleScoreTool, "database_stats", {}, ["/api/score/stats"]],
-    [handleScoreTool, "list_countries", {}, ["/api/score/countries"]],
-    [handleScoreTool, "check_credits", {}, ["/api/score/credits"]],
-
     // ── crm ──
-    [handleCrmTool, "crm_list_contacts", {}, ["/api/crm/contacts", {}]],
+    [handleCrmTool, "crm_list_contacts", {}, ["/api/crm/contacts", { limit: "20", offset: "0" }]],
     [handleCrmTool, "crm_list_contacts", { search: "rossi", stage: "lead", limit: 20 },
-        ["/api/crm/contacts", { search: "rossi", stage: "lead", limit: "20" }]],
+        ["/api/crm/contacts", { search: "rossi", stage: "lead", limit: "20", offset: "0" }]],
     [handleCrmTool, "crm_create_contact", { name: "Mario" },
         ["/api/crm/contacts", undefined, "POST", { name: "Mario" }]],
     // l'identificativo va nel percorso, NON nel corpo dell'aggiornamento
     [handleCrmTool, "crm_update_contact", { id: "c9", name: "nuovo" },
         ["/api/crm/contacts/c9", undefined, "PATCH", { name: "nuovo" }]],
-    [handleCrmTool, "crm_pipeline", {}, ["/api/crm/pipeline"]],
+    [handleCrmTool, "crm_pipeline", {}, ["/api/crm/pipeline", { limit: "50", offset: "0" }]],
     [handleCrmTool, "crm_contact_timeline", { contact_id: "c9" },
         ["/api/crm/contacts/c9/timeline"]],
 
@@ -81,19 +68,20 @@ const CASI: Caso[] = [
     // ── sara ──
     [handleSaraTool, "sara_chat", { message: "ciao", conversation_id: "k1" },
         ["/api/sara/chat", undefined, "POST", { message: "ciao", conversation_id: "k1" }]],
-    [handleSaraTool, "sara_conversations", {}, ["/api/sara/conversations", {}]],
+    [handleSaraTool, "sara_conversations", {}, ["/api/sara/conversations", { limit: "20", offset: "0" }]],
     [handleSaraTool, "sara_conversations", { limit: 3 },
-        ["/api/sara/conversations", { limit: "3" }]],
+        ["/api/sara/conversations", { limit: "3", offset: "0" }]],
     [handleSaraTool, "sara_insights", {}, ["/api/sara/business-insights"]],
-    [handleSaraTool, "sara_alerts", {}, ["/api/sara/alerts"]],
+    [handleSaraTool, "sara_alerts", {}, ["/api/sara/alerts", { limit: "20", offset: "0" }]],
     [handleSaraTool, "sara_proactive", {}, ["/api/sara/proactive"]],
 
     // ── finance ──
     [handleFinanceTool, "finance_summary", {}, ["/api/finance/summary"]],
     [handleFinanceTool, "finance_health_score", {}, ["/api/finance/health-score"]],
     [handleFinanceTool, "finance_cash_flow", {}, ["/api/finance/cash-flow", {}]],
+    // `period` non esiste piu: il backend non lo legge (descrizioni fedeli alle risposte vere, Policy 2.A)
     [handleFinanceTool, "finance_cash_flow", { period: "mensile", months: 6 },
-        ["/api/finance/cash-flow", { period: "mensile", months: "6" }]],
+        ["/api/finance/cash-flow", { months: "6" }]],
 
     // ── verticals ──
     [handleVerticalTool, "vertical_kpis", { vertical: "dineos" }, ["/api/dineos/kpis"]],
@@ -117,6 +105,38 @@ describe("ogni strumento chiama l endpoint giusto", () => {
         await (gestore as (n: string, a: Record<string, unknown>) => Promise<unknown>)(nome, args);
         expect(apiRequest).toHaveBeenCalledOnce();
         expect(apiRequest).toHaveBeenCalledWith(...(attesa as []));
+    });
+});
+
+// Lo Score e un servizio separato (score.get-scala.com/api/v1, X-API-Key): passa da scoreRequest, non da apiRequest.
+const CASI_SCORE: Array<[string, Record<string, unknown>, unknown[]]> = [
+    ["search_companies", { query: "Ferrero" }, ["/search", { limit: "10", q: "Ferrero" }]],
+    ["search_companies", { tax_id: "IT00159560366", country: "it", limit: 500 },
+        ["/search", { limit: "100", tax_id: "IT00159560366", country: "IT" }]],
+    ["search_companies", { query: "x", limit: "abc" }, ["/search", { limit: "10", q: "x" }]],
+    ["lookup_company", { company_id: "IT 1" }, ["/company/IT%201"]],
+    ["list_countries", {}, ["/countries"]],
+    ["check_credits", {}, ["/usage"]],
+];
+
+describe("gli strumenti Score chiamano il servizio Score", () => {
+    it.each(CASI_SCORE)("%s %j", async (nome, args, attesa) => {
+        await handleScoreTool(nome, args);
+        expect(scoreRequest).toHaveBeenCalledOnce();
+        expect(scoreRequest).toHaveBeenCalledWith(...(attesa as [string]));
+        expect(apiRequest).not.toHaveBeenCalled();
+    });
+
+    it("search_companies senza nome ne tax_id risponde con un errore e non chiama niente", async () => {
+        const r = await handleScoreTool("search_companies", {}) as { isError?: boolean };
+        expect(r.isError).toBe(true);
+        expect(scoreRequest).not.toHaveBeenCalled();
+    });
+
+    it("lookup_company senza id risponde con un errore e non chiama niente", async () => {
+        const r = await handleScoreTool("lookup_company", {}) as { isError?: boolean };
+        expect(r.isError).toBe(true);
+        expect(scoreRequest).not.toHaveBeenCalled();
     });
 });
 

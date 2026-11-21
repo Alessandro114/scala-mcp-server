@@ -1,4 +1,4 @@
-import { apiRequest, ok } from "../api.js";
+import { apiRequest, ok, seg } from "../api.js";
 
 export const bookingTools = [
   {
@@ -53,14 +53,14 @@ export async function handleBookingTool(name: string, args: Record<string, unkno
     case "booking_get_slots": {
       const params: Record<string, string> = {};
       if (args.date) params.date = args.date as string;
-      return ok(await apiRequest(`/api/booking/${args.booking_code}/slots`, params));
+      return ok(await apiRequest(`/api/booking/${seg(args.booking_code)}/slots`, params));
     }
     case "booking_create": {
       const { booking_code, ...body } = args;
-      return ok(await apiRequest(`/api/booking/${booking_code}`, undefined, "POST", body));
+      return ok(await apiRequest(`/api/booking/${seg(booking_code)}`, undefined, "POST", body));
     }
     case "booking_cancel":
-      return ok(await apiRequest(`/api/booking/manage/${args.booking_id}`, undefined, "DELETE"));
+      return ok(await apiRequest(`/api/booking/manage/${seg(args.booking_id)}`, undefined, "DELETE"));
     default:
       return { content: [{ type: "text" as const, text: `Unknown booking tool: ${name}` }], isError: true as const };
   }

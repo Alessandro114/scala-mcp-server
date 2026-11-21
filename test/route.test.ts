@@ -50,11 +50,10 @@ describe("smistamento per prefisso", () => {
         }
     });
 
-    // Questi sei sono nati prima della convenzione dei prefissi e i loro nomi
+    // Questi quattro sono nati prima della convenzione dei prefissi e i loro nomi
     // sono gia pubblicati: non si possono rinominare senza rompere chi li usa.
     it.each([
-        "search_companies", "lookup_company", "company_report",
-        "database_stats", "list_countries", "check_credits",
+        "search_companies", "lookup_company", "list_countries", "check_credits",
     ])("%s va allo score anche senza prefisso", async (nome) => {
         await routeTool(nome, {});
         expect(spie.score).toHaveBeenCalledOnce();
