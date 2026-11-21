@@ -4,31 +4,27 @@ export const financeTools = [
   {
     name: "finance_summary",
     description:
-      "Get a financial overview: revenue, expenses, profit, outstanding invoices, " +
-      "cash position, and month-over-month trends.",
+      "Get the year-to-date financial summary: revenue (paid invoices), cost of goods sold, operating expenses, " +
+      "tax, gross margin, EBITDA, net profit and total costs, in EUR. Does not include outstanding invoices or monthly trends.",
     inputSchema: { type: "object" as const, properties: {} },
   },
   {
     name: "finance_health_score",
     description:
-      "Get your business financial health score (0-100) with breakdown: " +
-      "liquidity, profitability, receivables aging, and burn rate.",
+      "Get your business financial health score (0-100) with a letter grade (A-F) and four scored factors: " +
+      "profit margin (max 30), revenue growth vs last year (max 25), cash flow as invoice collection rate over 6 months (max 25), " +
+      "and recent business activity (max 20).",
     inputSchema: { type: "object" as const, properties: {} },
   },
   {
     name: "finance_cash_flow",
     description:
-      "Get cash flow data with inflows, outflows, and net cash by period. " +
-      "Useful for forecasting and trend analysis.",
+      "Get monthly cash flow: inflows, outflows and net cash per month for the last N months, " +
+      "plus a 6-month projection (marked is_projection). Useful for forecasting and trend analysis.",
     inputSchema: {
       type: "object" as const,
       properties: {
-        period: {
-          type: "string",
-          enum: ["daily", "weekly", "monthly"],
-          description: "Aggregation period (default: monthly)",
-        },
-        months: { type: "number", description: "Lookback months (default 6)" },
+        months: { type: "number", description: "Months of history (default 12, max 36)" },
       },
     },
   },
@@ -42,7 +38,6 @@ export async function handleFinanceTool(name: string, args: Record<string, unkno
       return ok(await apiRequest("/api/finance/health-score"));
     case "finance_cash_flow": {
       const params: Record<string, string> = {};
-      if (args.period) params.period = args.period as string;
       if (args.months) params.months = String(args.months);
       return ok(await apiRequest("/api/finance/cash-flow", params));
     }

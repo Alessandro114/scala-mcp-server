@@ -1,12 +1,55 @@
-// Letti a ogni chiamata e non una volta sola all'import: un server MCP resta
+import { AsyncLocalStorage } from "node:async_hooks";
+import crypto from "node:crypto";
+
+/**
+ * Modalita' remota (server HTTP multi-utente): MCP_REMOTE=1. Qui NESSUNA credenziale
+ * viene mai letta dall'ambiente: ogni richiesta porta la propria (AsyncLocalStorage),
+ * altrimenti una chiave globale servirebbe tutti gli utenti con l'identita' di uno solo.
+ */
+export const REMOTE = process.env.MCP_REMOTE === "1";
+const credenziale = new AsyncLocalStorage<{ token: string }>();
+
+/**
+ * Identita' per il rate limit del backend (che chiave per `cf-connecting-ip`). Tutto il traffico del
+ * server MCP parte da un solo indirizzo: senza questo, tutti gli utenti dividerebbero un solo secchio.
+ * Il valore dipende dal token, quindi e' per-utente; e' un identificatore, non il token.
+ */
+export function identitaRateLimit(token: string): string {
+  return "mcp-" + crypto.createHash("sha256").update(token).digest("hex").slice(0, 16);
+}
+
+/** Esegue `fn` con il token dell'utente della richiesta corrente (solo modalita' remota). */
+export function conCredenziale<T>(token: string, fn: () => T): T {
+  return credenziale.run({ token }, fn);
+}
+
+// Stdio: letti a ogni chiamata e non una volta sola all'import: un server MCP resta
 // acceso per ore, e una chiave ruotata o un indirizzo cambiato devono avere
-// effetto senza riavviarlo. Prima erano costanti di modulo, quindi il valore
-// era quello del momento in cui Claude Desktop ha caricato il processo.
-const apiKey = () => process.env.SCALA_API_KEY || "";
+// effetto senza riavviarlo. Remoto: mai dall'ambiente (vedi sopra).
+const apiKey = () => (REMOTE ? "" : process.env.SCALA_API_KEY || "");
 const baseUrl = () =>
   (process.env.SCALA_API_URL || process.env.SCALA_BASE_URL || "https://app.get-scala.com").replace(/\/$/, "");
 
-if (!apiKey()) {
+function chiaveCorrente(): string {
+  if (!REMOTE) return apiKey();
+  const t = credenziale.getStore()?.token;
+  if (!t) throw new Error("Not authenticated");
+  return t;
+}
+
+/** Un segmento di percorso fornito dal modello: sempre codificato, mai vuoto. */
+export function seg(value: unknown): string {
+  const v = String(value ?? "").trim();
+  // "." e ".." sopravvivono a encodeURIComponent e fetch li normalizza: sposterebbero la richiesta su un'altra rotta.
+  if (!v || v.length > 200 || v === "." || v === ".." || /[\u0000-\u001f]/.test(v)) throw new Error("Invalid identifier");
+  return encodeURIComponent(v);
+}
+
+// S.C.A.L.A. Score (company data) is a separate service with its own key and base URL (stdio only).
+const scoreKey = () => (REMOTE ? "" : process.env.SCORE_API_KEY || apiKey());
+const scoreBase = () => (process.env.SCORE_API_URL || "https://score.get-scala.com/api/v1").replace(/\/$/, "");
+
+if (!REMOTE && !apiKey()) {
   console.error("Warning: SCALA_API_KEY not set. Some tools require authentication.");
   console.error("Get your API key at https://app.get-scala.com → Settings → API Keys");
 }
@@ -28,8 +71,9 @@ export async function apiRequest(
   const init: RequestInit = {
     method,
     headers: {
-      "X-API-Key": apiKey(),
+      "X-API-Key": chiaveCorrente(),
       "Content-Type": "application/json",
+      ...(REMOTE ? { "cf-connecting-ip": identitaRateLimit(chiaveCorrente()) } : {}),
     },
   };
   if (body) init.body = JSON.stringify(body);
@@ -42,8 +86,58 @@ export async function apiRequest(
   return resp.json();
 }
 
+/** GET against the Score API (/search, /company/{id}, /usage, /countries). Auth: X-API-Key. */
+export async function scoreRequest(endpoint: string, params?: Record<string, string>) {
+  if (REMOTE) throw new Error("Score tools are not available on the remote server yet.");
+  if (!scoreKey()) throw new Error("SCORE_API_KEY not set. Get a free key at https://score.get-scala.com/builders");
+  const url = new URL(`${scoreBase()}${endpoint}`);
+  for (const [k, v] of Object.entries(params ?? {})) {
+    if (v !== undefined && v !== "") url.searchParams.set(k, v);
+  }
+  const resp = await fetch(url, { headers: { "X-API-Key": scoreKey() } });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`Score API ${resp.status}: ${text.slice(0, 500)}`);
+  }
+  return resp.json();
+}
+
+// Tetto di dimensione della risposta nel remoto (Software Directory Policy 5.B: token proporzionati al compito).
+export const MAX_REMOTE_CHARS = parseInt(process.env.MCP_MAX_RESPONSE_CHARS || "40000", 10) || 40_000;
+
+/**
+ * Riduce l'elenco piu' lungo della risposta (dimezzandolo) finche' il testo sta nel tetto, e lo dichiara in `truncated`.
+ * Meglio un elenco corto e onesto che un JSON spezzato a meta'. Ritorna null se non c'e' un elenco da ridurre.
+ */
+export function restringi(data: unknown, max: number): unknown | null {
+  if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+  const obj = data as Record<string, unknown>;
+  let chiave: string | null = null;
+  for (const [k, v] of Object.entries(obj)) {
+    if (Array.isArray(v) && (chiave === null || v.length > (obj[chiave] as unknown[]).length)) chiave = k;
+  }
+  if (chiave === null) return null;
+  const tutto = obj[chiave] as unknown[];
+  let n = tutto.length;
+  while (n > 1) {
+    n = Math.max(1, Math.floor(n / 2));
+    const candidato = {
+      ...obj,
+      [chiave]: tutto.slice(0, n),
+      truncated: { message: `Response reduced to ${n} of ${tutto.length} items to stay under ${max} characters. Use a smaller limit, offset or filters.`, returned: n, total: tutto.length },
+    };
+    if ((JSON.stringify(candidato, null, 2) ?? "").length <= max) return candidato;
+  }
+  return null;
+}
+
 export function ok(data: unknown) {
-  return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] };
+  let text = JSON.stringify(data, null, 2) ?? "null";
+  if (REMOTE && text.length > MAX_REMOTE_CHARS) {
+    const ridotto = restringi(data, MAX_REMOTE_CHARS);
+    text = ridotto ? JSON.stringify(ridotto, null, 2) : text.slice(0, MAX_REMOTE_CHARS) + `\n...[truncated: response exceeded ${MAX_REMOTE_CHARS} characters; narrow the query]`;
+  }
+  return { content: [{ type: "text" as const, text }] };
 }
 
 export function err(message: string) {

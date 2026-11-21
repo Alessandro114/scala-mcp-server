@@ -2,7 +2,7 @@
   "name": "scala-mcp-server",
   "version": "1.0.0",
   "mcpName": "io.github.Alessandro114/scala-ai-os",
-  "description": "MCP server for S.C.A.L.A. AI OS — run your entire business from Claude. CRM, invoicing, bookings, AI assistant, 20 industry verticals, 249M+ company database.",
+  "description": "MCP server for S.C.A.L.A. AI OS — run your entire business from Claude. CRM, invoicing, bookings, AI assistant, 20 industry verticals, company database (249M records; financials only FR NO LT EE LV CO).",
   "type": "module",
   "bin": {
     "scala-mcp": "dist/index.js"
@@ -12,7 +12,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
-    "test": "vitest run --coverage"
+    "test": "vitest run --coverage && npm run test:remote",
+    "test:remote": "node --import tsx --test src/remote.test.ts src/pagina.test.ts src/risposta.test.ts src/descrizioni.test.ts",
+    "start:remote": "MCP_REMOTE=1 node dist/remote.js"
   },
   "keywords": [
     "mcp",

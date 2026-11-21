@@ -64,7 +64,7 @@ describe("strumenti", () => {
     it("gli argomenti attraversano il protocollo intatti", async () => {
         apiRequest.mockClear();
         await client.callTool({ name: "crm_list_contacts", arguments: { search: "rossi", limit: 7 } });
-        expect(apiRequest).toHaveBeenCalledWith("/api/crm/contacts", { search: "rossi", limit: "7" });
+        expect(apiRequest).toHaveBeenCalledWith("/api/crm/contacts", { search: "rossi", limit: "7", offset: "0" });
     });
 
     it("uno strumento senza argomenti non fa cadere il server", async () => {
